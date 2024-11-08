@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN" "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+
+    <constant name="struts.devMode" value="true" />
+
+    <package name="default" namespace="/" extends="struts-default">
+
+        <interceptors>
+            <interceptor name="authInterceptor" class="com.loanapp.interceptors.AuthInterceptor"></interceptor>
+            <interceptor name="roleBasedInterceptor" class="com.loanapp.interceptors.RoleBasedInterceptor"></interceptor>
+
+            <interceptor-stack name="authStack">
+                <interceptor-ref name="authInterceptor"></interceptor-ref>
+                <interceptor-ref name="roleBasedInterceptor"></interceptor-ref>
+                <interceptor-ref name="defaultStack"></interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="authStack"></default-interceptor-ref>
+
+        <global-results>
+            <result name="unauthorized">/unauthorized.jsp</result>
+        </global-results>
+
+        <!-- signup action -->
+        <action name="signup" class="com.loanapp.actions.SignupAction">
+            <interceptor-ref name="defaultStack"></interceptor-ref>
+            <result name="success" type="redirect">/waiting.jsp</result>
+            <result name="error">/signup.jsp</result>
+        </action>
+
+        <!-- login action -->
+        <action name="login" class="com.loanapp.actions.LoginAction">
+            <interceptor-ref name="defaultStack"></interceptor-ref>
+            <result name="admin_user" type="redirect">/admin/home</result>
+            <result name="verifier" type="redirect">/verifier/home</result>
+            <result name="success" type="redirect">home</result>
+            <result name="error">/login.jsp</result>
+        </action>
+    
+        <!-- home action -->
+        <action name="home">
+            <result name="success">/home.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+
+        <!-- logout action -->
+        <action name="logout" class="com.loanapp.actions.LogoutAction">
+            <result name="*">/login.jsp</result>
+        </action>
+
+    </package>
+
+
+    <!-- admin package -->
+    <package name="admin" namespace="/admin" extends="struts-default,default">
+
+        <action name="home" class="com.loanapp.actions.admin.AdminAction">
+            <result name="success">/jsp/admin/home.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+
+        <action name="accept_verifier" class="com.loanapp.actions.admin.AdminAction" method="acceptVerifier">
+            <result name="*" type="redirect">home</result>
+        </action>
+
+        <action name="reject_verifier" class="com.loanapp.actions.admin.AdminAction" method="rejectVerifier">
+            <result name="*" type="redirect">home</result>
+        </action>
+
+    </package>
+
+
+    <!-- verifier package -->
+    <package name="verifier" namespace="/verifier" extends="struts-default,default">
+
+        <action name="home" class="com.loanapp.actions.verifier.VerifierAction">
+            <result name="success">/jsp/verifier/home.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+
+        <action name="accept_user" class="com.loanapp.actions.verifier.VerifierAction" method="acceptUser">
+            <result name="*" type="redirect">home</result>
+        </action>
+
+        <action name="reject_user" class="com.loanapp.actions.verifier.VerifierAction" method="rejectUser">
+            <result name="*" type="redirect">home</result>
+        </action>
+
+        <action name="allow_user" class="com.loanapp.actions.verifier.VerifierUserAction" method="allowUser">
+            <result name="*" type="redirect">home</result>
+        </action>
+
+        <action name="block_user" class="com.loanapp.actions.verifier.VerifierUserAction" method="blockUser">
+            <result name="*" type="redirect">home</result>
+        </action>
+
+        <!-- verifier profile actions -->
+        <action name="profile" class="com.loanapp.actions.verifier.VerifierAction">
+            <result name="success" type="redirect">/jsp/verifier/home.jsp</result>
+            <result name="error" type="redirect">home</result>
+        </action>
+
+        <action name="change_password" class="com.loanapp.utils.ChangePassword">
+            <result name="success" type="redirect">home</result>
+            <result name="error" type="redirect">profile</result>
+        </action>
+
+    </package>
+
+
+
+    <!-- user package -->
+
+    <package name="user" namespace="/user" extends="struts-default,default">
+
+    </package>
+</struts>
