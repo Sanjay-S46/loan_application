@@ -31,14 +31,14 @@ public class VerifierUserAction{
     
     // method for allowing a user from blocked state
     public String allowUser(){
-        String q = "update user set isBlocked=0 where username=?";
+        String q = "update users set isBlocked=0 where username=?";
         setQuery(q);
         return userOperation();
     }
 
     //method for blocking the user
     public String blockUser(){
-        String q = "update user set isBlocked=1 where username=?";
+        String q = "update users set isBlocked=1 where username=?";
         setQuery(q);
         return userOperation();
     }

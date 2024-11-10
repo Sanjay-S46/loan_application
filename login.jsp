@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="/loanApplication/js/login_validation.js"></script>
+    <%-- <script type="text/javascript" src="/loanApplication/js/login_validation.js"></script> --%>
 
 </body>
 </html>

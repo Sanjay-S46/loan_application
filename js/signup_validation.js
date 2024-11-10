@@ -1,3 +1,4 @@
+// function to clear the error message
 function clearError(errorId) {
     let errorElement = document.getElementById(errorId);
     errorElement.style.display = "none";

@@ -13,7 +13,7 @@
             <h1>Sign Up</h1>
         </div>
         <div class="signup-form">
-            <form id="signupForm" onsubmit="return validateForm(event)">
+            <form id="signupForm" onsubmit="return validateForm(event)" action="signup" method="post">
                 <div class="form-group">
                     <input type="text" id="username" name="username" placeholder=" " oninput="validateUsername()" onfocus="clearError('usernameError')" />
                     <label for="username">Username</label>
@@ -67,7 +67,7 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="/loanApplication/js/signup_validation.js"></script>
+    <%-- <script type="text/javascript" src="/loanApplication/js/signup_validation.js"></script> --%>
 
 </body>
 </html>

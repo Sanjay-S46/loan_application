@@ -29,7 +29,7 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
 
     // authenticating the user
     private boolean checkUser(){
-        String query = "select randomSalt,password,userType from user where username=?" ;
+        String query = "select randomSalt,password,userType from users where username=?" ;
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);

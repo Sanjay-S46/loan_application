@@ -41,7 +41,7 @@ public class ChangePassword {
 
     //check if the current password is correct or not
     private boolean isCorrectPassword(){
-        String query = "select password,randomSalt from user where username=?";
+        String query = "select password,randomSalt from users where username=?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -83,7 +83,7 @@ public class ChangePassword {
             e.printStackTrace();
         }
 
-        String query = "update user set password=? where username=?";
+        String query = "update users set password=? where username=?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);

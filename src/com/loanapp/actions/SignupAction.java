@@ -21,7 +21,7 @@ public class SignupAction extends ActionSupport implements ModelDriven<User>{
     }
 
     private boolean isExistingUser(){
-        String query = "select username from user where username = ?";
+        String query = "select username from users where username = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -40,7 +40,7 @@ public class SignupAction extends ActionSupport implements ModelDriven<User>{
     }
 
     private boolean insert(){
-        String query = "insert into user (username, emailId, mobileNo, gender, userType) values(?,?,?,?,?)";
+        String query = "insert into users (username, emailId, mobileNo, gender, userType) values(?,?,?,?,?)";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);

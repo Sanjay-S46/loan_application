@@ -12,11 +12,8 @@ import javax.mail.internet.MimeMessage;
 
 public class SendMail {
 
-    // private String from = System.getenv("SENDER_EMAIL");
-    // private String password = System.getenv("PASSWORD");
-    
-    private String from = "210701231@rajalakshmi.edu.in";
-    private String password = "s@nj@y2003";
+    private String from = System.getenv("SENDER_EMAIL");
+    private String password = System.getenv("PASSWORD");
 
     public void sendMailThread(String to, String subject, String message) {
         Runnable mailTask = () -> {

@@ -28,7 +28,7 @@ public class ProfileAction extends ActionSupport {
     }
 
     private void getUserInfo(String username){
-        String query = "select emailId,mobileNo,gender,userType from user where username=?";
+        String query = "select emailId,mobileNo,gender,userType from users where username=?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);

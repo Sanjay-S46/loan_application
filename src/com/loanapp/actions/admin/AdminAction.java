@@ -56,7 +56,7 @@ public class AdminAction extends ActionSupport implements ModelDriven<User>{
 
     //query to getting all users
     private void getAllUsers(){
-        String query = "select * from user where isVerified=1";
+        String query = "select * from users where isVerified=1";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -87,7 +87,7 @@ public class AdminAction extends ActionSupport implements ModelDriven<User>{
 
     //query for getting the new verifiers for verification process
     private void getAllNewVerifiers(){
-        String query = "select * from user where userType='verifier' and isVerified=0";
+        String query = "select * from users where userType='verifier' and isVerified=0";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -118,7 +118,7 @@ public class AdminAction extends ActionSupport implements ModelDriven<User>{
 
     //method for accepting the verifier 
     public String acceptVerifier(){ 
-        String query = "update user set isVerified=1, randomSalt=?, password=?  where username=?";
+        String query = "update users set isVerified=1, randomSalt=?, password=?  where username=?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -148,7 +148,7 @@ public class AdminAction extends ActionSupport implements ModelDriven<User>{
 
     // sending email to the user with the password  
     private void sendMail(String password, String uname){
-        String query = "select emailId from user where username=?";
+        String query = "select emailId from users where username=?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -187,7 +187,7 @@ public class AdminAction extends ActionSupport implements ModelDriven<User>{
 
     //method for rejecting the verifier
     public String rejectVerifier(){
-        String query = "delete from user where username = ?";
+        String query = "delete from users where username = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
