@@ -165,7 +165,7 @@
     <div class="navbar">
         <h1>Loan Application</h1>
         <div class="buttons">
-            <a href="<s:url action='logout'/>" class="logout-button">Logout</a>
+            <a href="<s:url action='logout'/>" id="logout-button">Logout</a>
         </div>
     </div>
 

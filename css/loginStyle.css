@@ -30,7 +30,7 @@ h1 {
 }
 
 .form-group input {
-    width: 95%;
+    width: 100%;
     padding: 0.8rem 0.5rem;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -90,4 +90,11 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: -8px;
+    margin-bottom: 12px;
 }

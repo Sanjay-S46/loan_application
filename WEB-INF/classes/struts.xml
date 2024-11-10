@@ -98,11 +98,12 @@
         </action>
 
         <!-- verifier profile actions -->
-        <action name="profile" class="com.loanapp.actions.verifier.VerifierAction">
-            <result name="success" type="redirect">/jsp/verifier/home.jsp</result>
+
+        <action name="userProfile" class="com.loanapp.actions.verifier.ProfileAction">
+            <result name="success">/jsp/verifier/profile.jsp</result>
             <result name="error" type="redirect">home</result>
         </action>
-
+    
         <action name="change_password" class="com.loanapp.utils.ChangePassword">
             <result name="success" type="redirect">home</result>
             <result name="error" type="redirect">profile</result>

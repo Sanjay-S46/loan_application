@@ -20,7 +20,7 @@
             <a onclick="showSection('blocked-users')">Blocked Users</a>
         </div>
         <div class="buttons">
-            <a href='<s:url action="profile" />' class="profile-icon"><i class="fa fa-user"></i></a>
+            <a href='<s:url action="userProfile" />' id="profile-icon"><i class="fa fa-user"></i></a>
             <a href='<s:url action="logout" />' id="logout-button">Logout</a>
         </div>
 
