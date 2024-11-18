@@ -3,6 +3,7 @@ package com.loanapp.actions;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import com.loanapp.DatabaseConnection;
 import com.loanapp.models.User;
@@ -43,7 +44,7 @@ public class SignupAction extends ActionSupport implements ModelDriven<User>{
         String query = "insert into users (username, emailId, mobileNo, gender, userType) values(?,?,?,?,?)";
         try (
             Connection conn = db.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement(query);
+            PreparedStatement preparedStatement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
         ) {
             //setting the values
             preparedStatement.setString(1, user.getUsername());
@@ -53,15 +54,39 @@ public class SignupAction extends ActionSupport implements ModelDriven<User>{
             preparedStatement.setString(5, user.getUserType());
 
             int result = preparedStatement.executeUpdate();
-            System.out.println("User inserted successfully..");
-
-            return result>0;
+            
+            if (result > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int userId = generatedKeys.getInt(1);  // retrieve the auto-generated user_id
+                        addToVerificationTable(userId);
+                        System.out.println("User inserted successfully with user_id: " + userId);
+                    }
+                }
+                return true;
+            }
             
         } 
         catch (Exception e) {
             e.printStackTrace();    
         }
         return false;
+    }
+
+    private void addToVerificationTable(int userId){
+        String query = "insert into verification (user_id) values(?)";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeUpdate();
+            System.out.println("Inserted into verification table...");
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Could not insert into verification table...");
+        }
     }
 
     @Override
@@ -76,6 +101,4 @@ public class SignupAction extends ActionSupport implements ModelDriven<User>{
         
         return "success";
     }
-
-    
 }

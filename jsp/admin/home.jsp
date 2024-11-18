@@ -15,8 +15,9 @@
         <div class="nav-links">
             <a onclick="showSection('all-users')">All Users</a>
             <a onclick="showSection('verifiers')">Verifiers</a>
-            <a onclick="showSection('borrowers')">Borrowers</a>
-            <a onclick="showSection('lenders')">Lenders</a>
+            <a onclick="showSection('rejected-users')">Rejected verifiers</a>
+            <%-- <a onclick="showSection('borrowers')">Borrowers</a>
+            <a onclick="showSection('lenders')">Lenders</a> --%>
             <a onclick="showSection('incoming-requests')">Incoming Requests</a>
         </div>
         <div class="buttons">
@@ -34,6 +35,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,6 +45,7 @@
                             <td><s:property value="username" /></td>
                             <td><s:property value="emailId" /></td>
                             <td><s:property value="userType" /></td>
+                            <td><s:property value="status" /></td>
                         </tr>
                     </s:iterator>
                 </tbody>
@@ -63,6 +66,7 @@
                             <th>Username</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Status</th>
                             <th>Options</th>
                         </tr>
                     </thead>
@@ -75,6 +79,7 @@
                                 <td><s:property value="username" /></td>
                                 <td><s:property value="emailId" /></td>
                                 <td><s:property value="userType" /></td>
+                                <td><s:property value="status" /></td>
                                 <td>
                                     <form action="accept_verifier" method="post" style="display: inline;">
                                         <input type="hidden" name="username" value="<s:property value='username' />" />
@@ -104,6 +109,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -116,6 +122,7 @@
                                 <td><s:property value="username" /></td>
                                 <td><s:property value="emailId" /></td>
                                 <td><s:property value="userType" /></td>
+                                <td><s:property value="status" /></td>
                             </tr>
                         </s:if>
                     </s:iterator>
@@ -123,9 +130,45 @@
             </table>
         </div>
 
-        <div id="borrowers" class="section hidden">
+
+        <div id="rejected-users" class="section hidden">
+            <h2>Rejected verifiers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <s:set var="verifierCount" value="0" />
+                    <s:iterator value="users">
+                        <s:if test="userType=='verifier' && status=='Rejected' ">
+                            <s:set var="verifierCount" value="#verifierCount + 1" />
+                            <tr>
+                                <td><s:property value="#verifierCount" /></td>
+                                <td><s:property value="username" /></td>
+                                <td><s:property value="emailId" /></td>
+                                <td><s:property value="userType" /></td>
+                                <td>
+                                    <form action="accept_verifier" method="post" style="display: inline;">
+                                        <input type="hidden" name="username" value="<s:property value='username' />" />
+                                        <button type="submit" class="accept-link">Accept</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </s:if>
+                    </s:iterator>
+                </tbody>
+            </table>
+        </div>
+
+        <%-- <div id="borrowers" class="section hidden">
             <h2>Borrowers</h2>
-            <%-- <p>No borrowers available at this moment.</p> --%>
+            <p>No borrowers available at this moment.</p>
 
             <table>
                 <thead>
@@ -134,6 +177,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,16 +190,17 @@
                                 <td><s:property value="username" /></td>
                                 <td><s:property value="emailId" /></td>
                                 <td><s:property value="userType" /></td>
+                                <td><s:property value="status" /></td>
                             </tr>
                         </s:if>
                     </s:iterator>
                 </tbody>
             </table>
-        </div>
+        </div> --%>
 
-        <div id="lenders" class="section hidden">
+        <%-- <div id="lenders" class="section hidden">
             <h2>Lenders</h2>
-            <%-- <p>No lenders available at this moment.</p> --%>
+            <p>No lenders available at this moment.</p>
 
             <table>
                 <thead>
@@ -164,6 +209,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -176,13 +222,14 @@
                                 <td><s:property value="username" /></td>
                                 <td><s:property value="emailId" /></td>
                                 <td><s:property value="userType" /></td>
+                                <td><s:property value="status" /></td>
                             </tr>
                         </s:if>
                     </s:iterator>
                 </tbody>
             </table>
+        </div> --%>
 
-        </div>
     </div>
 
     <script>

@@ -22,6 +22,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
     private User user;
     private String username;
+    private int userId;
 
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<User> newUsers = new ArrayList<>();
@@ -45,6 +46,9 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
     public void setBlockedUsers(ArrayList<User> blockedUsers){
         this.blockedUsers = blockedUsers;
     }
+    public void setUserId(int userId){
+        this.userId = userId;
+    }
 
     //getters
     public ArrayList<User> getUsers(){
@@ -59,10 +63,14 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
     public ArrayList<User> getBlockedUsers(){
         return blockedUsers;
     }
+    public int getId(){
+        getUserId();
+        return userId;
+    }
 
     //query to getting all the borrowes and lenders (users)
     private void getAllUsers(){
-        String query = "select * from users where isVerified=1 and isBlocked=0 and userType in ('borrower', 'lender')";
+        String query = "select username, emailId, userType, status from users inner join verification on users.user_id=verification.user_id where userType in ('borrower', 'lender')";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -76,11 +84,13 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
                 String username = resultSet.getString("username");
                 String emailId = resultSet.getString("emailId");
                 String userType = resultSet.getString("userType");
+                String status = resultSet.getString("status");
                 
                 //setting the database values to the setter methods of ther User class
                 user.setUsername(username);
                 user.setEmailId(emailId);
                 user.setUserType(userType);
+                user.setStatus(status);
 
                 //adding the user to the arraylist
                 users.add(user);
@@ -93,7 +103,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
     //query for getting the new verifiers for verification process
     private void getAllNewUsers(){
-        String query = "select * from users where userType in ('borrower', 'lender') and isVerified=0";
+        String query = "select username, emailId, userType, status from users inner join verification on users.user_id=verification.user_id where userType in ('borrower', 'lender') and status in ('In progress')";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -107,11 +117,13 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
                 String username = resultSet.getString("username");
                 String emailId = resultSet.getString("emailId");
                 String userType = resultSet.getString("userType");
+                String status = resultSet.getString("status");
                 
                 //setting the database values to the setter methods of ther User class
                 user.setUsername(username);
                 user.setEmailId(emailId);
                 user.setUserType(userType);
+                user.setStatus(status);
 
                 //adding the user to the arraylist
                 newUsers.add(user);
@@ -124,7 +136,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
     // method for getting all the blocked users
     public void getAllBlockedUsers(){
-        String query = "select * from users where isBlocked=1";
+        String query = "select username,emailId,userType from users where isBlocked=1";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -135,9 +147,9 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
                 user = new User();
                 
                 //getting the values from the database
-                String username = resultSet.getString("username");
-                String emailId = resultSet.getString("emailId");
-                String userType = resultSet.getString("userType");
+                String username = resultSet.getString(1);
+                String emailId = resultSet.getString(2);
+                String userType = resultSet.getString(3);
                 
                 //setting the database values to the setter methods of ther User class
                 user.setUsername(username);
@@ -146,6 +158,25 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
                 //adding the user to the arraylist
                 blockedUsers.add(user);
+            }
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // method for getting the user id
+    private void getUserId(){
+        String query = "select user_id from users where username=?";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setString(1, getUsername());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                setUserId(resultSet.getInt(1));
             }
         } 
         catch (Exception e) {
@@ -174,6 +205,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
             int value = preparedStatement.executeUpdate();
 
             if (value > 0) {
+                updateVerificationTable("Verified");
                 return "success";
             }
             
@@ -204,13 +236,6 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
                                         "<p><strong>Your password is: " + password + "</strong></p>" +
                                         "<p><a href='http://localhost:8080/loanApplication/login.jsp'>Click here to log in</a></p>" +
                                     "</body>" ;
-    
-                // if (mail.sendMail(email, subject, message)) {
-                //     System.out.println("Mail sent successfully");
-                // }
-                // else{
-                //     System.out.println("Mail failed to send");
-                // }
 
                 mail.sendMailThread(email, subject, message);
             }
@@ -226,7 +251,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
     //method for rejecting the user
     public String rejectUser(){
-        String query = "delete from users where username = ?";
+        String query = "update users set isVerified=0 where username=?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -234,6 +259,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
             preparedStatement.setString(1, getUsername());
             int value = preparedStatement.executeUpdate();
             if (value > 0) {
+                updateVerificationTable("Rejected");
                 return "success";
             }
 
@@ -243,6 +269,25 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
         return "error";
     }
 
+
+    // updating the entry into verification table
+    private void updateVerificationTable(String status){
+
+        String query = "update verification set verified_by=1 , status=? , verification_date=NOW() where user_id=?";
+
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setString(1, status);
+            preparedStatement.setInt(2, getId());
+            preparedStatement.executeUpdate();
+
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public String execute(){

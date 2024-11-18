@@ -18,7 +18,7 @@
             margin: 20px auto;
         }
 
-        h2 {
+        .profile-heading {
             color: #333;
             text-align: center;
             margin-bottom: 20px;
@@ -165,6 +165,7 @@
     <div class="navbar">
         <h1>Loan Application</h1>
         <div class="buttons">
+            <a href='<s:url action="home" />' id="home-icon"><i class="fa-solid fa-house"></i></a>
             <a href="<s:url action='logout'/>" id="logout-button">Logout</a>
         </div>
     </div>
@@ -172,7 +173,7 @@
 
     <!-- Profile Page Content -->
     <div class="profile-container">
-        <h2>User Profile</h2>
+        <h2 class="profile-heading">User Profile</h2>
         <div class="profile-info">
             <table>
                 <tr>
@@ -218,7 +219,7 @@
 
                 <div class="modal-buttons">
                     <input type="submit" class="btn-submit" value="Submit" />
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <input type="submit" class="btn-cancel" value="Cancel" onclick="closeModal()" />
                 </div>
             </form>
         </div>

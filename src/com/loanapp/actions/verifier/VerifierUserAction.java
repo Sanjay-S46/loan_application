@@ -31,7 +31,7 @@ public class VerifierUserAction{
     
     // method for allowing a user from blocked state
     public String allowUser(){
-        String q = "update users set isBlocked=0 where username=?";
+        String q = "update users set isBlocked=0 and login_attempts=0 where username=?";
         setQuery(q);
         return userOperation();
     }

@@ -60,6 +60,25 @@ body {
     color: white;
 }
 
+#home-icon {
+    font-size: 20px;
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #dcdcdc;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#home-icon:hover {
+    background-color: #333;
+    color: white;
+}
+
 #logout-button {
     display: inline-block;
     padding: 10px 20px;

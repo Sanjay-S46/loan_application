@@ -20,7 +20,6 @@ public class AuthInterceptor implements Interceptor{
 
         if (session != null &&  session.getAttribute("userSession")!= null) {
             session.setMaxInactiveInterval(60*60);
-            System.out.println("Session successfully set...");
             return invocation.invoke();
         } 
         else {

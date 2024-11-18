@@ -17,9 +17,11 @@
             <a onclick="showSection('borrowers')">Borrowers</a>
             <a onclick="showSection('lenders')">Lenders</a>
             <a onclick="showSection('incoming-requests')">Incoming Requests</a>
+            <a onclick="showSection('rejected-users')">Rejected Users</a>
             <a onclick="showSection('blocked-users')">Blocked Users</a>
         </div>
         <div class="buttons">
+            <a href='<s:url action="home" />' id="home-icon"><i class="fa fa-house"></i></a>
             <a href='<s:url action="userProfile" />' id="profile-icon"><i class="fa fa-user"></i></a>
             <a href='<s:url action="logout" />' id="logout-button">Logout</a>
         </div>
@@ -36,6 +38,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,6 +48,7 @@
                             <td><s:property value="username" /></td>
                             <td><s:property value="emailId" /></td>
                             <td><s:property value="userType" /></td>
+                            <td><s:property value="status" /></td>
                         </tr>
                     </s:iterator>
                 </tbody>
@@ -65,6 +69,7 @@
                             <th>Username</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Status</th>
                             <th>Options</th>
                         </tr>
                     </thead>
@@ -77,6 +82,7 @@
                                 <td><s:property value="username" /></td>
                                 <td><s:property value="emailId" /></td>
                                 <td><s:property value="userType" /></td>
+                                <td><s:property value="status" /></td>
                                 <td>
                                     <form action="accept_user" method="post" style="display: inline;">
                                         <input type="hidden" name="username" value="<s:property value='username' />" />
@@ -105,6 +111,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                         <th>Options</th>
                     </tr>
                 </thead>
@@ -118,6 +125,7 @@
                                 <td><s:property value="username" /></td>
                                 <td><s:property value="emailId" /></td>
                                 <td><s:property value="userType" /></td>
+                                <td><s:property value="status" /></td>
                                 <td>
                                     <form action="block_user" method="post" style="display: inline;">
                                         <input type="hidden" name="username" value="<s:property value='username' />" />
@@ -142,6 +150,7 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Status</th>
                         <th>Options</th>
                     </tr>
                 </thead>
@@ -155,6 +164,7 @@
                                 <td><s:property value="username" /></td>
                                 <td><s:property value="emailId" /></td>
                                 <td><s:property value="userType" /></td>
+                                <td><s:property value="status" /></td>
                                 <td>
                                     <form action="block_user" method="post" style="display: inline;">
                                         <input type="hidden" name="username" value="<s:property value='username' />" />
@@ -167,6 +177,41 @@
                 </tbody>
             </table>
 
+        </div>
+
+        <div id="rejected-users" class="section hidden">
+            <h2>Rejected Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <s:set var="counter" value="0" />
+                    <s:iterator value="users">
+                        <s:if test="status=='Rejected' ">
+                            <s:set var="counter" value="#counter + 1" />
+                            <tr>
+                                <td><s:property value="#counter" /></td>
+                                <td><s:property value="username" /></td>
+                                <td><s:property value="emailId" /></td>
+                                <td><s:property value="userType" /></td>
+                                <td>
+                                    <form action="accept_user" method="post" style="display: inline;">
+                                        <input type="hidden" name="username" value="<s:property value='username' />" />
+                                        <button type="submit" class="accept-link">Accept</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </s:if>
+                    </s:iterator>
+                </tbody>
+            </table>
         </div>
 
         <div id="blocked-users" class="section hidden">

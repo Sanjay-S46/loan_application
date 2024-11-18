@@ -36,22 +36,17 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
-
             preparedStatement.setString(1, user.getUsername());
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            int value = 0;
-
             if (resultSet.next()) {
-                value = resultSet.getInt("login_attempts");
+                return resultSet.getInt("login_attempts");
             }
-
-            return value;
-            
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             e.printStackTrace();
-            return 0;
         }
+        return 0;
     }
 
     // update the login attempts of the user
@@ -93,7 +88,7 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
 
     // authenticating the user
     private boolean checkUser(){
-        String query = "select randomSalt,password,userType from users where username=?" ;
+        String query = "select user_id,randomSalt,password,userType from users where username=?" ;
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -116,6 +111,7 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
                 }
                 
                 user.setUserType(userType);
+                user.setUserId(resultSet.getInt("user_id"));
                 
                 return HashPassword.verifyPassword(user.getPassword(), pwd, salt);
             }
@@ -136,6 +132,7 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
 
         if (login_attempts > MAX_LOGIN_ATTEMPTS) {
             lockUserAccount();
+            System.out.println("Account locked due to failed login attempts");
             return "error";
         }
         
@@ -152,6 +149,7 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
             return "success";
         }
         else{
+            System.out.println("Login attempts count = " + login_attempts);
             updateLoginAttempts(login_attempts+1);
         }
         return "error";
