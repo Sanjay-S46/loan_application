@@ -21,6 +21,8 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
 
     private boolean isAdminUser = false;
     private boolean isVerifier = false;
+    private boolean isLender = false;
+    private boolean isBorrower = false;
     private static final int MAX_LOGIN_ATTEMPTS = 5;
 
 
@@ -109,7 +111,13 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
                 else if (userType.equals("verifier")) {
                     isVerifier = true;
                 }
-                
+                else if (userType.equals("borrower")) {
+                    isBorrower = true;
+                }
+                else if (userType.equals("lender")) {
+                    isLender = true;
+                }
+        
                 user.setUserType(userType);
                 user.setUserId(resultSet.getInt("user_id"));
                 
@@ -146,7 +154,12 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
             else if (isVerifier) {
                 return "verifier";
             }
-            return "success";
+            else if (isBorrower) {
+                return "borrower";
+            }
+            else if (isLender) {
+                return "lender";
+            }
         }
         else{
             System.out.println("Login attempts count = " + login_attempts);

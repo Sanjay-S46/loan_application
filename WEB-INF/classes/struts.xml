@@ -36,7 +36,8 @@
             <interceptor-ref name="defaultStack"></interceptor-ref>
             <result name="admin_user" type="redirect">/admin/home</result>
             <result name="verifier" type="redirect">/verifier/home</result>
-            <result name="success" type="redirect">home</result>
+            <result name="borrower" type="redirect">/borrower/home</result>
+            <result name="lender" type="redirect">/lender/home</result>
             <result name="error">/login.jsp</result>
         </action>
     
@@ -106,16 +107,71 @@
     
         <action name="change_password" class="com.loanapp.utils.ChangePassword">
             <result name="success" type="redirect">home</result>
-            <result name="error" type="redirect">profile</result>
+            <result name="error" type="redirect">userProfile</result>
         </action>
 
     </package>
 
 
 
-    <!-- user package -->
+    <!-- borrower package -->
+    <package name="borrower" namespace="/borrower" extends="struts-default,default">
 
-    <package name="user" namespace="/user" extends="struts-default,default">
+        <action name="home" class="com.loanapp.actions.borrower.BorrowerAction">
+            <result name="success">/jsp/borrower/home.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+
+        <action name="applyLoan" class="com.loanapp.actions.borrower.LoanRequestAction">
+            <result name="success" type="redirect">home</result>
+            <result name="error">/unauthorized.jsp</result>
+        </action>
+
+        <!-- borrower profile actions -->
+
+        <action name="userProfile" class="com.loanapp.actions.borrower.BorrowerProfileAction">
+            <result name="success">/jsp/borrower/profile.jsp</result>
+            <result name="error" type="redirect">home</result>
+        </action>
+
+        <action name="update_profile" class="com.loanapp.actions.borrower.BorrowerProfileAction" method="updateBorrowerTable">
+            <result name="success" type="redirect">home</result>
+            <result name="error" type="redirect">userProfile</result>
+        </action>
+    
+        <action name="change_password" class="com.loanapp.utils.ChangePassword">
+            <result name="success" type="redirect">home</result>
+            <result name="error" type="redirect">userProfile</result>
+        </action>
 
     </package>
+
+
+    <!-- lender package -->
+    <package name="lender" namespace="/lender" extends="struts-default,default">
+
+        <action name="home" class="com.loanapp.actions.lender.LenderAction">
+            <result name="success">/jsp/lender/home.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+
+        <!-- lender profile actions -->
+
+         <action name="userProfile" class="com.loanapp.actions.lender.LenderProfileAction">
+            <result name="success">/jsp/lender/profile.jsp</result>
+            <result name="error" type="redirect">home</result>
+        </action>
+
+        <action name="change_password" class="com.loanapp.utils.ChangePassword">
+            <result name="success" type="redirect">home</result>
+            <result name="error" type="redirect">userProfile</result>
+        </action>
+
+        <action name="deposit_amount" class="com.loanapp.actions.lender.LenderProfileAction" method="updateLenderTable">
+            <result name="success" type="redirect">home</result>
+            <result name="error" type="redirect">userProfile</result>
+        </action>
+
+    </package>
+
 </struts>

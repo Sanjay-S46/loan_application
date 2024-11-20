@@ -159,6 +159,25 @@
             background-color: #c82333;
         }
 
+        #home-icon {
+            font-size: 20px;
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #dcdcdc;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #home-icon:hover {
+            background-color: #333;
+            color: white;
+        }
+
     </style>
 </head>
 <body>

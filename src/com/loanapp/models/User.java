@@ -10,6 +10,9 @@ public class User {
     private String userType;
     private String password;
     private String status;
+    private long annualIncome;
+    private String assets;
+    private long availableFunds;
 
     //setters
     public void setUserId(int userId){
@@ -36,6 +39,15 @@ public class User {
     public void setStatus(String status){
         this.status = status;
     }
+    public void setAssets(String assets){
+        this.assets = assets;
+    }
+    public void setAnnualIncome(long annualIncome){
+        this.annualIncome = annualIncome;
+    }
+    public void setAvailableFunds(long availableFunds){
+        this.availableFunds = availableFunds;
+    }
 
     //getters
     public int getUserId(){
@@ -61,5 +73,14 @@ public class User {
     }
     public String getStatus(){
         return status;
+    }
+    public String getAssets(){
+        return assets;
+    }
+    public long getAnnualIncome(){
+        return annualIncome; 
+    }
+    public long getAvailableFunds(){
+        return availableFunds;
     }
 }

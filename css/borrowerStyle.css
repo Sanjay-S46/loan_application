@@ -1,0 +1,499 @@
+body {
+    background-color: #f0f2f5;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar h1 {
+    margin: 0;
+    color: #333;
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+}
+
+/* Styling for the logout button (a) */
+.logout {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #DC3545;
+    color: white;
+    font-size: 20px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+.logout:hover {
+    background-color: #C82333;
+}
+
+.buttons i {
+    font-size: 28px; 
+    color: #333;
+    margin-right: 15px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.buttons i:hover {
+    color: #555;
+}
+
+/* Navigation Links */
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #333;
+    padding: 5px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.nav-links a:hover {
+    background-color: #ddd;
+}
+
+/* Main content */
+.content {
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px auto;
+    width: 80%;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Styles */
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.section-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.section-content {
+    font-size: 18px;
+    color: #666;
+}
+
+.overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.welcome-message {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.current-balance {
+    font-size: 24px;
+    color: #007bff;
+    margin: 0;
+}
+
+.max-loan {
+    font-size: 24px;
+    color: #28a745;
+    text-align: left;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+.loan-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.loan-table th, 
+.loan-table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.loan-table th {
+    background-color: #007bff;
+    color: white;
+    text-transform: uppercase;
+    font-size: 16px;
+}
+
+.loan-table tr:last-child td {
+    border-bottom: none;
+}
+
+.loan-table td {
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+}
+
+/* Loan Request Form Styles */
+
+#loan-request{
+    text-align: center;
+}
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-group label {
+    font-size: 16px;
+    color: #333;
+    display: block;
+    flex: 1;
+    text-align: left;
+    position: relative;
+    left: 200px;
+}
+
+.form-group input,
+.form-group select {
+    font-size: 16px;
+    padding: 12px;
+    width: 60%;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    position: relative;
+    right: 100px;
+}
+
+.form-group select{
+    width: 61.85%;
+}
+
+.add-lender-btn, .submit-btn {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.add-lender-btn:hover, .submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.lender-group {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lender-group input {
+    font-size: 16px;
+    padding: 10px;
+    width: 85%;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.lender-group .remove-lender {
+    font-size: 20px;
+    color: red;
+    cursor: pointer;
+    margin-left: 10px;
+}
+input[type=number] {
+    -webkit-appearance: textfield; /* For WebKit browsers */
+    -moz-appearance: textfield;    /* For Mozilla browsers */
+    appearance: textfield;         /* Standard property */
+}
+
+
+/* Profile Page Styling */
+.profile-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.profile-heading {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-info table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profile-info th, .profile-info td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.profile-info th {
+    background-color: #f4f4f4;
+}
+
+.change-password {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn-change-password {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-change-password:hover {
+    background-color: #0056b3;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px; /* Increased width */
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal h3 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.modal label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.modal input {
+    width: 95%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.modal .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal .btn-submit,
+.modal .btn-cancel {
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 48%;
+}
+
+.modal .btn-submit {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    margin-right: 4%;
+}
+
+.modal .btn-submit:hover {
+    background-color: #218838;
+}
+
+.modal .btn-cancel {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.modal .btn-cancel:hover {
+    background-color: #c82333;
+}
+
+#home-icon {
+    font-size: 20px;
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #dcdcdc;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#home-icon:hover {
+    background-color: #333;
+    color: white;
+}
+
+.save-button {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn-save {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-save:hover {
+    background-color: #0056b3;
+}
+
+/* Loan Status Section Styles */
+#loan-status{
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    text-align: center;
+}
+
+.loan-status-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.loan-status-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.loan-status-table th,
+.loan-status-table td {
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.loan-status-table th {
+    background-color: #34495e;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.loan-status-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.loan-status-table tbody tr:hover {
+    background-color: #dff9fb;
+    transition: background-color 0.3s;
+}
+
+.loan-status-table td {
+    color: #2c3e50;
+}
+
+.loan-status-table td i {
+    margin-right: 5px;
+    color: #16a085;
+}
+
+.loan-status-table td:last-child {
+    font-weight: bold;
+}

@@ -62,7 +62,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>User ID</th>
+                            <th>S.No</th>
                             <th>Username</th>
                             <th>Email</th>
                             <th>Role</th>

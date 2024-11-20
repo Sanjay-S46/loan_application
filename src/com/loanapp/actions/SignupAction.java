@@ -60,8 +60,8 @@ public class SignupAction extends ActionSupport implements ModelDriven<User>{
                     if (generatedKeys.next()) {
                         int userId = generatedKeys.getInt(1);  // retrieve the auto-generated user_id
                         addToVerificationTable(userId);
-                        System.out.println("User inserted successfully with user_id: " + userId);
                     }
+
                 }
                 return true;
             }

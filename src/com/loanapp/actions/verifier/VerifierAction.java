@@ -23,10 +23,14 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
     private User user;
     private String username;
     private int userId;
+    private String userType;
 
-    private ArrayList<User> users = new ArrayList<>();
+    private ArrayList<User> borrowers = new ArrayList<>();
+    private ArrayList<User> lenders = new ArrayList<>();
     private ArrayList<User> newUsers = new ArrayList<>();
     private ArrayList<User> blockedUsers = new ArrayList<>();
+    private ArrayList<User> rejectedUsers = new ArrayList<>();
+    
 
     @Override
     public User getModel() {
@@ -34,14 +38,23 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
     }
 
     //setters
-    public void setUsers(ArrayList<User> users){
-        this.users = users;
+    public void setBorrowers(ArrayList<User> borrowers){
+        this.borrowers = borrowers;
+    }
+    public void setLenders(ArrayList<User> lenders){
+        this.lenders = lenders;
+    }
+    public void setRejectedUsers(ArrayList<User> rejectedUsers){
+        this.rejectedUsers = rejectedUsers;
     }
     public void setNewUsers(ArrayList<User> newUsers){
         this.newUsers = newUsers;
     }
     public void setUsername(String username){
         this.username = username;
+    }
+    public void setUserType(String userType){
+        this.userType = userType;
     }
     public void setBlockedUsers(ArrayList<User> blockedUsers){
         this.blockedUsers = blockedUsers;
@@ -51,14 +64,23 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
     }
 
     //getters
-    public ArrayList<User> getUsers(){
-        return users;
+    public ArrayList<User> getBorrowers(){
+        return borrowers;
+    }
+    public ArrayList<User> getLenders(){
+        return lenders;
+    }
+    public ArrayList<User> getRejectedUsers(){
+        return rejectedUsers;
     }
     public ArrayList<User> getNewUsers(){
         return newUsers;
     }
     public String getUsername(){
         return username;
+    }
+    public String getUserType(){
+        return userType;
     }
     public ArrayList<User> getBlockedUsers(){
         return blockedUsers;
@@ -70,7 +92,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
     //query to getting all the borrowes and lenders (users)
     private void getAllUsers(){
-        String query = "select username, emailId, userType, status from users inner join verification on users.user_id=verification.user_id where userType in ('borrower', 'lender')";
+        String query = "select username, emailId, userType, status from users inner join verification on users.user_id=verification.user_id where userType in ('borrower', 'lender') and isBlocked=0 and isVerified=1";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -93,7 +115,15 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
                 user.setStatus(status);
 
                 //adding the user to the arraylist
-                users.add(user);
+                if (status.equals("Rejected")) {
+                    rejectedUsers.add(user);
+                }
+                else if (userType.equals("borrower")) {
+                    borrowers.add(user);
+                }
+                else if (userType.equals("lender")){
+                    lenders.add(user);
+                }
             }
         } 
         catch (Exception e) {
@@ -167,7 +197,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
     // method for getting the user id
     private void getUserId(){
-        String query = "select user_id from users where username=?";
+        String query = "select user_id,userType from users where username=?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -177,6 +207,7 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
 
             if (resultSet.next()) {
                 setUserId(resultSet.getInt(1));
+                setUserType(resultSet.getString(2)+"s");
             }
         } 
         catch (Exception e) {
@@ -193,9 +224,6 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
         ) {
             String pwd = passwordGenertor.generatePassword();
 
-            // sending the password to the respective user email id
-            sendMail(pwd,getUsername());
-
             String[] hashedPassword = passwordHasher.generateHashedPassword(pwd);
 
             preparedStatement.setString(1, hashedPassword[0]);
@@ -205,6 +233,9 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
             int value = preparedStatement.executeUpdate();
 
             if (value > 0) {
+                // sending the password to the respective user email id
+                sendMail(pwd,getUsername());
+
                 updateVerificationTable("Verified");
                 return "success";
             }
@@ -282,7 +313,23 @@ public class VerifierAction extends ActionSupport implements ModelDriven<User>{
             preparedStatement.setString(1, status);
             preparedStatement.setInt(2, getId());
             preparedStatement.executeUpdate();
+            insertIntoTable();
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    // after accepting the particular user (lender or borrower) adding to the respective table
+    private void insertIntoTable(){
+
+        String query = "INSERT INTO " + getUserType() + " (user_id) SELECT user_id FROM users WHERE username = ?";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setString(1, getUsername());
+            preparedStatement.executeUpdate();
         } 
         catch (Exception e) {
             e.printStackTrace();
