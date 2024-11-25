@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="/loanApplication/css/borrowerStyle.css">
 
     <style>
-        
-
     </style>
 </head>
 
@@ -22,6 +20,7 @@
             <a onclick="showSection('overview')">Overview</a>
             <a onclick="showSection('loan-request')">Loan Request</a>
             <a onclick="showSection('loan-status')">Loan Status</a>
+            <%-- <a onclick="showSection('loan-details-from-lender')">Loan Details from Lender</a> --%>
             <a onclick="showSection('transaction-history')">Transaction History</a>
         </div>
         <div class="buttons">
@@ -93,16 +92,7 @@
                     <input type="number" id="loan-term" name="loanMonth" placeholder="Enter loan term in months">
                 </div>
 
-                <div class="form-group" id="lender-1-group">
-                    <label for="lender-amount1">Lender 1 Loan Amount:</label>
-                    <input type="number" id="lender-amount1" placeholder="Enter amount from Lender 1">
-                </div>
-
-                <!-- Dynamic Lender Fields (Hidden initially) -->
-                <div id="additional-lenders"></div>
-
                 <button class="submit-btn" type="submit">Submit Loan Request</button>
-                <button class="add-lender-btn" onclick="addLender()">Add Another Lender</button>
             </form>
         </div>
 
@@ -129,7 +119,7 @@
                             <s:set var="counter" value="0" />
                             <s:iterator value="loans">
                                 <s:set var="counter" value="#counter + 1" />
-                                <tr>
+                                <tr onclick="submitLoanForm('<s:property value='loanId' />')">
                                     <td><s:property value="#counter" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="loanAmount" /></td>
                                     <td><s:property value="loanMonth" /></td>
@@ -139,6 +129,9 @@
                             </s:iterator>
                         </tbody>
                     </table>
+                    <form action="show_loan_detail" method="post" id="loanForm">
+                        <input type="hidden" name="loanId" id="hiddenLoanId" value="" />
+                    </form>
                 </s:else>
             </div>
         </div>
@@ -184,51 +177,15 @@
             });
             document.getElementById(sectionId).classList.add('active');
         }
+    </script>
+    <script>
+        function submitLoanForm(loanId) {
+            // Set the loanId in the hidden input field
+            document.getElementById('hiddenLoanId').value = loanId;
 
-        let lenderCount = 1;
-
-        function addLender() {
-            if (lenderCount < 3) {
-                lenderCount++;
-                const lenderField = document.createElement('div');
-                lenderField.classList.add('lender-group');
-                lenderField.id = `lender-${lenderCount}-group`;
-                lenderField.innerHTML = `
-                    <input type="number" id="lender-amount${lenderCount}" placeholder="Enter amount from Lender ${lenderCount}">
-                    <i class="fas fa-minus remove-lender" onclick="removeLender(${lenderCount})"></i>
-                `;
-                document.getElementById('additional-lenders').appendChild(lenderField);
-            } else {
-                alert('You can only add up to 3 lenders.');
-            }
+            // Submit the form
+            document.getElementById('loanForm').submit();
         }
-
-        function removeLender(lenderId) {
-            const lenderField = document.getElementById(`lender-${lenderId}-group`);
-            lenderField.remove();
-            lenderCount--;
-        }
-
-        function submitLoanRequest() {
-            const loanAmount = document.getElementById('loan-amount').value;
-            const loanTerm = document.getElementById('loan-term').value;
-            let lenderAmounts = [];
-
-            for (let i = 1; i <= lenderCount; i++) {
-                const lenderAmount = document.getElementById(`lender-amount${i}`).value;
-                if (lenderAmount) {
-                    lenderAmounts.push(`Lender ${i}: $${lenderAmount}`);
-                }
-            }
-
-            if (!loanAmount || !loanTerm) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-
-            alert(`Loan request submitted. Details: Total Loan: $${loanAmount}, Term: ${loanTerm} months, ${lenderAmounts.join(', ')}`);
-        }
-
     </script>
 </body>
 </html>

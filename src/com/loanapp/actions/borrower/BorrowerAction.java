@@ -19,12 +19,14 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan>{
 
     private DatabaseConnection db = new DatabaseConnection();
     private Loan loan;
+    
 
     private String username;
     private long currentBalance;
     private int userId;
     private long maxLoanAmount;
     private ArrayList<Loan> loans = new ArrayList<>();
+    
 
 
     // setters
@@ -46,6 +48,7 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan>{
     public void setLoans(ArrayList<Loan> loans){
         this.loans = loans;
     }
+    
 
     // getters
     public String getUsername(){
@@ -66,6 +69,7 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan>{
     public ArrayList<Loan> getLoans(){
         return loans;
     }
+
 
     @Override
     public Loan getModel() {
@@ -94,8 +98,8 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan>{
     }
 
     // getting the loan info for the particular borrower
-    public void getLoanInfo(int userId){
-        String query = "select requested_amount,loan_tenure_months,status,loan_type from loans inner join borrowers" 
+    public void getLoanStatusInfo(int userId){
+        String query = "select requested_amount,loan_tenure_months,status,loan_type,loan_id from loans inner join borrowers" 
                         + " on loans.borrower_id = borrowers.borrower_id where user_id = ?";
 
         try (
@@ -115,6 +119,7 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan>{
                 loan.setStatus(resultSet.getString(3));
                 loan.setLoanType(resultSet.getString(4));
                 loan.setUserId(userId);
+                loan.setLoanId(resultSet.getInt(5));
                 
                 // adding each loan onject to the array list
                 loans.add(loan);
@@ -124,6 +129,7 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan>{
             e.printStackTrace();
         }
     }
+
 
     @Override
     public String execute(){
@@ -136,7 +142,8 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan>{
                 setUserId(sessionUser.getUserId());
 
                 getAmountInfo();
-                getLoanInfo(getUserId());
+                getLoanStatusInfo(getUserId());
+
                 return "success";
             }
             else{

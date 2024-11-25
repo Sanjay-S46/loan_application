@@ -9,6 +9,7 @@ public class Loan {
     private String loanType;
     private String loanPurpose;
     private long maxLoanAmount;
+    private int loanId;
 
     // setters
     public void setLoanAmount(long loanAmount){
@@ -32,6 +33,9 @@ public class Loan {
     public void setMaxLoanAmount(long maxLoanAmount){
         this.maxLoanAmount = maxLoanAmount;
     }
+    public void setLoanId(int loanId){
+        this.loanId = loanId;
+    }
 
     // getters
     public long getLoanAmount(){
@@ -54,6 +58,9 @@ public class Loan {
     }
     public long getMaxLoanAmount(){
         return maxLoanAmount;
+    }
+    public int getLoanId(){
+        return loanId;
     }
 
 }

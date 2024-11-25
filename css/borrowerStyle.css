@@ -55,6 +55,8 @@ body {
 /* Navigation Links */
 .nav-links {
     display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 20px;
 }
 
@@ -169,6 +171,7 @@ body {
 #loan-request{
     text-align: center;
 }
+
 .form-group {
     margin-bottom: 20px;
     display: flex;
@@ -202,7 +205,7 @@ body {
     width: 61.85%;
 }
 
-.add-lender-btn, .submit-btn {
+.submit-btn {
     background-color: #007bff;
     border: none;
     color: white;
@@ -214,32 +217,10 @@ body {
     text-align: center;
 }
 
-.add-lender-btn:hover, .submit-btn:hover {
+.submit-btn:hover {
     background-color: #0056b3;
 }
 
-.lender-group {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.lender-group input {
-    font-size: 16px;
-    padding: 10px;
-    width: 85%;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-}
-
-.lender-group .remove-lender {
-    font-size: 20px;
-    color: red;
-    cursor: pointer;
-    margin-left: 10px;
-}
 input[type=number] {
     -webkit-appearance: textfield; /* For WebKit browsers */
     -moz-appearance: textfield;    /* For Mozilla browsers */

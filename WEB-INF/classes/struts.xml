@@ -122,9 +122,24 @@
             <result name="error">/login.jsp</result>
         </action>
 
+        <action name="show_loan_detail" class="com.loanapp.actions.borrower.LoanDetailAction">
+            <result name="success">/jsp/borrower/loanDetail.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+
         <action name="applyLoan" class="com.loanapp.actions.borrower.LoanRequestAction">
             <result name="success" type="redirect">home</result>
             <result name="error">/unauthorized.jsp</result>
+        </action>
+
+        <action name="accept_loan" class="com.loanapp.actions.borrower.LoanAction">
+            <result name="success" type="redirect">home</result>
+            <result name="error">/error.jsp</result>
+        </action>
+
+        <action name="reject_loan" class="com.loanapp.actions.borrower.LoanAction" method="rejectLoan">
+            <result name="success" type="redirect">home</result>
+            <result name="error">/error.jsp</result>
         </action>
 
         <!-- borrower profile actions -->
@@ -155,6 +170,11 @@
             <result name="error">/login.jsp</result>
         </action>
 
+        <action name="lend_loan" class="com.loanapp.actions.lender.LendLoanAction">
+            <result name="success" type="redirect">home</result>
+            <result name="error" type="redirect">/unauthorized.jsp</result>
+        </action>
+
         <!-- lender profile actions -->
 
          <action name="userProfile" class="com.loanapp.actions.lender.LenderProfileAction">
@@ -167,7 +187,7 @@
             <result name="error" type="redirect">userProfile</result>
         </action>
 
-        <action name="deposit_amount" class="com.loanapp.actions.lender.LenderProfileAction" method="updateLenderTable">
+        <action name="deposit_amount" class="com.loanapp.actions.lender.LenderProfileAction" method="depositAmount">
             <result name="success" type="redirect">home</result>
             <result name="error" type="redirect">userProfile</result>
         </action>

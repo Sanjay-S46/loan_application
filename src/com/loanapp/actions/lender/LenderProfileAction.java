@@ -84,21 +84,24 @@ public class LenderProfileAction extends ActionSupport{
     }
 
     // method for depositing the amount give by the lender
-    public String updateLenderTable(){
+    public String depositAmount(){
         String query = "update lenders set available_funds = ? where user_id = ?";
         User user = (User) ServletActionContext.getRequest().getSession(false).getAttribute("userSession"); 
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
-            
-            long totalAmount = getDepositAmount() + getAvailableFundAmount(user.getUserId());
+            long deposit = getDepositAmount();
+            long totalAmount = deposit + getAvailableFundAmount(user.getUserId());
             preparedStatement.setLong(1, totalAmount);
             preparedStatement.setInt(2, user.getUserId());
 
             int result = preparedStatement.executeUpdate();
 
-            return result > 0 ? "success" : "error";
+            if (result > 0) {
+                insertIntoTransactionTable(user.getUserId(),deposit);
+                return "success";
+            }
         } 
         catch (Exception e) {
             e.printStackTrace();
@@ -106,6 +109,33 @@ public class LenderProfileAction extends ActionSupport{
         return "error";
     }
 
+    // method for inserting the deposit amount in the transaction table
+    private void insertIntoTransactionTable(int userId,long deposit){
+        String query = "insert into transaction_history (user_id , lender_id, amount, transaction_type) " + 
+                        "values (?,(select lender_id from lenders where user_id = ?),?,?)";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.setLong(3, deposit);
+            preparedStatement.setString(4, "Deposit");
+
+            int result = preparedStatement.executeUpdate();
+
+            if (result > 0) {
+                System.out.println("Successfully inserted to transaction table");
+            }
+            else{
+                System.out.println("Failed to insert in transaction table");
+            }
+
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @Override

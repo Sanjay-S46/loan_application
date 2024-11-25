@@ -86,9 +86,13 @@
                             <p><strong>Loan Term : </strong> <s:property value="loanMonth"/> months</p>
                         </div>
                         <div class="interest-rate">
-                            <form action="" method="post">
+                            <form action="lend_loan" method="post">
                                 <input type="number" name="interestRate" placeholder="Interest Rate (%)" min="1" max="20">
                                 <input type="number" name="grantLoanAmount" placeholder="Amount" >
+                                <input type="hidden" name="borrowerName" value="<s:property value='username'/>">
+                                <input type="hidden" name="requestedAmount" value="<s:property value='requestedAmount'/>">
+                                <input type="hidden" name="loanMonth" value="<s:property value='loanMonth'/>">
+                                <input type="hidden" name="loanId" value="<s:property value='loanId'/>">
                                 <button type="submit">Lend</button>
                             </form>
                              <p class="status <s:property value='status.toLowerCase()' />">
@@ -122,30 +126,35 @@
         <div class="section" id="transaction-history">
             <div class="section-title">Transaction History</div>
             <div class="history-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Borrower</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>01/01/2024</td>
-                            <td>John Doe</td>
-                            <td>$10,000</td>
-                            <td>Paid</td>
-                        </tr>
-                        <tr>
-                            <td>02/01/2024</td>
-                            <td>Jane Smith</td>
-                            <td>$8,000</td>
-                            <td>Pending</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <s:if test="history.size()==0">
+                    <h2>No transactions history at the moment</h2>
+                </s:if>
+                <s:else>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Transaction Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <s:set var="counter" value="0" />
+                            <s:iterator value="history">
+                                <s:set var="counter" value="#counter + 1" />
+                                <tr>
+                                    <td><s:property value="#counter" /></td>
+                                    <td><s:property value="date" /></td>
+                                    <td><s:property value="name" /></td>
+                                    <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="amount" /></td>
+                                    <td><s:property value="transactionType" /></td>
+                                </tr>
+                            </s:iterator>
+                        </tbody>
+                    </table>
+                </s:else>
             </div>
         </div>
     </div>
