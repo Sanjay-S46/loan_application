@@ -1,7 +1,6 @@
 package com.loanapp.actions.lender;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -11,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.struts2.ServletActionContext;
 
 import com.loanapp.DatabaseConnection;
+import com.loanapp.models.TransactionHistory;
 import com.loanapp.models.User;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -67,45 +67,6 @@ class LoanDetail{
         return loanId;
     }
 }
-
-// class used for storing the transaction history of the particular user
-class TransactionHistory{
-
-    private long amount;
-    private Date date;
-    private String transactionType;
-    private String name;
-
-    // setters
-    public void setAmount(long amount){
-        this.amount = amount;
-    }
-    public void setDate(Date date){
-        this.date = date;
-    }
-    public void setTransactionType(String transactionType){
-        this.transactionType = transactionType;
-    }
-    public void setName(String name){
-        this.name = name;
-    }
-
-    // getters  
-    public long getAmount(){
-        return amount;
-    }
-    public Date getDate(){
-        return date;
-    }
-    public String getTransactionType(){
-        return transactionType;
-    }
-    public String getName(){
-        return name;
-    }
-
-}
-
 
 // ===============================================================================================================================
 
@@ -263,6 +224,7 @@ public class LenderAction extends ActionSupport{
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
+            preparedStatement.setInt(1, borrowerId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
@@ -283,7 +245,7 @@ public class LenderAction extends ActionSupport{
             User sessionUser = (User) session.getAttribute("userSession");
             if (sessionUser!=null && sessionUser.getUsername() != null) {
 
-                setUsername(sessionUser.getUsername().toUpperCase());
+                setUsername(sessionUser.getUsername());
                 setUserId(sessionUser.getUserId());
 
                 getAmountInfo();

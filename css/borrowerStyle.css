@@ -227,6 +227,24 @@ input[type=number] {
     appearance: textfield;         /* Standard property */
 }
 
+/* Transaction History Section */
+.history-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+    padding: 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 18px;
+    /* Increased font size for table text */
+}
+
+.history-table th {
+    background-color: #f8f9fa;
+}
 
 /* Profile Page Styling */
 .profile-container {

@@ -121,7 +121,7 @@ public class LoanDetailAction extends ActionSupport{
     // method for getting the loan details from lender
     public void loanStatusFromLender(){
         String query = "select lender_id, interest_rate, loan_grant_amount, loan_tenure_months, loans.loan_id, distribution_id from loan_distribution"
-                        + " inner join loans on loan_distribution.loan_id = loans.loan_id where loans.loan_id = ?";
+                    + " inner join loans on loan_distribution.loan_id = loans.loan_id where loans.loan_id = ? and status not in ('Fully Funded','Closed') ";
 
         try (
             Connection conn = db.getConnection();

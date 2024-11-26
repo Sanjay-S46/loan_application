@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/loanApplication/css/borrowerStyle.css">
 
     <style>
+
     </style>
 </head>
 
@@ -20,7 +21,6 @@
             <a onclick="showSection('overview')">Overview</a>
             <a onclick="showSection('loan-request')">Loan Request</a>
             <a onclick="showSection('loan-status')">Loan Status</a>
-            <%-- <a onclick="showSection('loan-details-from-lender')">Loan Details from Lender</a> --%>
             <a onclick="showSection('transaction-history')">Transaction History</a>
         </div>
         <div class="buttons">
@@ -38,27 +38,40 @@
                 <h2 class="max-loan">Max Loan Amount: <i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="maxLoanAmount" default="0" /></h2>
             </div>
             <h2 class="current-balance">Current Balance: <i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="currentBalance" /></h2>
-            <h3>Your Current Loans</h3>
-            <div class="loan-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Loan Amount</th>
-                            <th>EMI Paid</th>
-                            <th>EMI Pending</th>
-                            <th>Due Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><i class="fa-solid fa-indian-rupee-sign"></i> 50,000</td>
-                            <td><i class="fa-solid fa-indian-rupee-sign"></i> 5,000</td>
-                            <td><i class="fa-solid fa-indian-rupee-sign"></i> 45,000</td>
-                            <td>12/15/2024</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <s:if test="emiDetails.size()==0">
+                <h3>No EMI's are available at the moment..</h3>
+            </s:if>
+            <s:else>
+                <h3>Your Current EMI'S</h3>
+                <div class="loan-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S.no</th>
+                                <th>Loan Amount</th>
+                                <th>EMI Amount</th>
+                                <th>EMI Paid</th>
+                                <th>EMI Pending</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <s:set var="counter" value="0" />
+                            <s:iterator value="emiDetails">
+                                <s:set var="counter" value="#counter + 1" />
+                                <tr>
+                                    <td><s:property value="#counter" /> </td>
+                                    <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="loanAmount" /></td>
+                                    <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiAmount" /></td>
+                                    <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiPaid" /></td>
+                                    <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiPending" /></td>
+                                    <td><s:property value="date" /></td>
+                                </tr>
+                            </s:iterator>
+                        </tbody>
+                    </table>
+                </div>
+            </s:else>
         </div>
 
 
@@ -140,30 +153,35 @@
         <div class="section" id="transaction-history">
             <div class="section-title">Transaction History</div>
             <div class="history-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Lender</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>01/01/2024</td>
-                            <td>Lender 1</td>
-                            <td>$30,000</td>
-                            <td>Paid</td>
-                        </tr>
-                        <tr>
-                            <td>02/01/2024</td>
-                            <td>Lender 2</td>
-                            <td>$20,000</td>
-                            <td>Pending</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <s:if test="history.size()==0">
+                    <h2>No transactions history at the moment</h2>
+                </s:if>
+                <s:else>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Date</th>
+                                <th>Lender Name</th>
+                                <th>Amount</th>
+                                <th>Transaction Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <s:set var="counter" value="0" />
+                            <s:iterator value="history">
+                                <s:set var="counter" value="#counter + 1" />
+                                <tr>
+                                    <td><s:property value="#counter" /></td>
+                                    <td><s:property value="date" /></td>
+                                    <td><s:property value="name" /></td>
+                                    <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="amount" /></td>
+                                    <td><s:property value="transactionType" /></td>
+                                </tr>
+                            </s:iterator>
+                        </tbody>
+                    </table>
+                </s:else>
             </div>
         </div>
     </div>

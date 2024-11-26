@@ -28,6 +28,7 @@ public class LoanAction extends ActionSupport{
     private long currentBalance;
     private int lenderUserId;
     private int borrowerUserId;
+    private long maxLoanAmount;
 
     // setters
     public void setEmi(int emi){
@@ -59,6 +60,9 @@ public class LoanAction extends ActionSupport{
     }
     public void setBorrowerUserId(int borrowerUserId){
         this.borrowerUserId = borrowerUserId;
+    }
+    public void setMaxLoanAmount(long maxLoanAmount){
+        this.maxLoanAmount = maxLoanAmount;
     }
 
     // getters
@@ -92,13 +96,17 @@ public class LoanAction extends ActionSupport{
     public int getBorrowerUserId(){
         return borrowerUserId;
     }
+    public long getMaxLoanAmount(){
+        return maxLoanAmount;
+    }
 
     // method used for getting all the details used for updating the loan details
     private void getLoanDistributionInfo(int distributionId){
         String query = "select loans.loan_id, balance_amount, lenders.lender_id, borrowers.borrower_id, loan_grant_amount, "
-                    + " available_funds, current_loan_balance, lenders.user_id, borrowers.user_id from "
+                    + " available_funds, current_loan_balance, lenders.user_id, borrowers.user_id, max_loan_amount from "
                     + " loan_distribution inner join loans on loan_distribution.loan_id=loans.loan_id inner join lenders on "
-                    + " lenders.lender_id=loan_distribution.lender_id inner join borrowers on borrowers.borrower_id=loan_distribution.borrower_id where distribution_id = ?"; 
+                    + " lenders.lender_id=loan_distribution.lender_id inner join borrowers on borrowers.borrower_id = "
+                    + " loan_distribution.borrower_id where distribution_id = ?"; 
 
         try (
             Connection conn = db.getConnection();
@@ -126,6 +134,7 @@ public class LoanAction extends ActionSupport{
                 setCurrentBalance(resultSet.getLong(7));
                 setLenderUserId(resultSet.getInt(8));
                 setBorrowerUserId(resultSet.getInt(9));
+                setMaxLoanAmount(resultSet.getLong(10));
 
                 System.out.println("All the details are displayed from the tables");
 
@@ -188,15 +197,18 @@ public class LoanAction extends ActionSupport{
 
     // update the borrower's table's current loan balance amount (i.e) it will increase 
     private void updateLoanBalance(){
-        String query = "update borrowers set current_loan_balance = ? where borrower_id = ?";
+        String query = "update borrowers set current_loan_balance = ?, max_loan_amount = ? where borrower_id = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
+            
             long amount = getCurrentBalance() + getLoanGrantedAmount();
+            long maxAmount = getMaxLoanAmount() - getLoanGrantedAmount();
 
             preparedStatement.setLong(1, amount);
-            preparedStatement.setInt(2, getBorrowerId());
+            preparedStatement.setLong(2, maxAmount);
+            preparedStatement.setInt(3, getBorrowerId());
             int result = preparedStatement.executeUpdate();
 
             if (result > 0) {
@@ -238,32 +250,24 @@ public class LoanAction extends ActionSupport{
     // update transaction history for the lender
     private void updateTransactionHistory(String role,int id){
 
-        String query = "insert into transaction_history ";
-        if (role.equals("lender")) {
-            query += "(user_id, lender_id, amount, transaction_type)";
-        }
-        else{
-            query += "(user_id, borrower_id, amount, transaction_type)";
-        }
-        query += "values (?,?,?,?)";
+        String query = "insert into transaction_history (user_id, lender_id, borrower_id, amount, transaction_type) values (?,?,?,?,?)";
 
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
-
-            preparedStatement.setInt(2, id);
-            preparedStatement.setLong(3, getLoanGrantedAmount());
+            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(2, getLenderUserId());
+            preparedStatement.setInt(3, getBorrowerUserId());
+            preparedStatement.setLong(4, getLoanGrantedAmount());
 
             if (role.equals("lender")) {
-                preparedStatement.setInt(1, getLenderUserId());
-                preparedStatement.setString(4, "Lended");
+                preparedStatement.setString(5, "Lended");
             }
             else{
-                preparedStatement.setInt(1, getBorrowerUserId());
-                preparedStatement.setString(4, "Borrowed");
+                preparedStatement.setString(5, "Borrowed");
             }
-
+            
             preparedStatement.executeUpdate();
 
             System.out.println("Transaction table is updated.. ");
