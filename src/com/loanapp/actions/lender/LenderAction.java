@@ -26,6 +26,7 @@ class LoanDetail{
     private int loanMonth;
     private String status;
     private int loanId;
+    private long balanceAmount;
 
     // setters
     public void setUsername(String username){
@@ -45,6 +46,9 @@ class LoanDetail{
     }
     public void setLoanId(int loanId){
         this.loanId = loanId;
+    }
+    public void setBalanceAmount(long balanceAmount){
+        this.balanceAmount = balanceAmount;
     }
 
     // getters
@@ -66,6 +70,9 @@ class LoanDetail{
     public int getLoanId(){
         return loanId;
     }
+    public long getBalanceAmount(){
+        return balanceAmount;
+    }
 }
 
 // ===============================================================================================================================
@@ -81,6 +88,7 @@ public class LenderAction extends ActionSupport{
     private String username;
     private long availableFunds;
     private int userId;
+    private int lenderId;
 
     // setters
     public void setUsername(String username){
@@ -103,6 +111,9 @@ public class LenderAction extends ActionSupport{
     }
     public void setHistory(ArrayList<TransactionHistory> history){
         this.history = history;
+    }
+    public void setLenderId(int lenderId){
+        this.lenderId = lenderId;
     }
 
     // getters
@@ -127,6 +138,9 @@ public class LenderAction extends ActionSupport{
     public ArrayList<TransactionHistory> getHistory(){
         return history;
     }
+    public int getLenderId(){
+        return lenderId;
+    }
 
     // method used for setting the username and fund amount to the home page of the lender
     private void getAmountInfo(){
@@ -148,19 +162,54 @@ public class LenderAction extends ActionSupport{
         }
     }
 
-    // method used for getting the loan requests
-    private void getLoanRequests(){
-        String query = "select username, requested_amount, loan_purpose, loan_tenure_months, status, loan_id from loans join borrowers "
-            + " on borrowers.borrower_id = loans.borrower_id join users on borrowers.user_id = users.user_id where loan_id not in "
-            + "(select loan_id from loan_distribution where lender_id = (select lender_id from lenders where user_id = ?))";
+    // getting the lender id of current user
+    private void getLenderIdOfUser(int userId){
+        String query = "select lender_id from lenders where user_id = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
-            preparedStatement.setInt(1, getUserId());
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                setLenderId(resultSet.getInt(1));
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    // method used for getting the loan requests
+    private void getLoanRequests(){
+        String query = "select username, requested_amount, loan_purpose, loan_tenure_months, status, loans.loan_id, lender_list, "
+                    +" balance_amount from loans inner join borrowers on loans.borrower_id=borrowers.borrower_id inner join users on "
+                    +" borrowers.user_id=users.user_id where status not in ('Fully Funded','Closed')";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
+
+                String lenderListStr = resultSet.getString(7); 
+                boolean skipLoan = false;
+
+                if (lenderListStr != null) {
+                    String[] lenderList = lenderListStr.split(",");
+                    for (String lender : lenderList) {
+                        if (Integer.parseInt(lender.trim()) == getLenderId()) {
+                            skipLoan = true; 
+                            break; 
+                        }
+                    }
+                }
+
+                if (skipLoan) {
+                    continue;
+                }
 
                 loanDetail = new LoanDetail();
                 loanDetail.setUsername(resultSet.getString(1));
@@ -169,6 +218,7 @@ public class LenderAction extends ActionSupport{
                 loanDetail.setLoanMonth(resultSet.getInt(4));
                 loanDetail.setStatus(resultSet.getString(5));
                 loanDetail.setLoanId(resultSet.getInt(6));
+                loanDetail.setBalanceAmount(resultSet.getLong(8));
 
                 //adding to the array list
                 loanDetails.add(loanDetail);
@@ -178,6 +228,9 @@ public class LenderAction extends ActionSupport{
             e.printStackTrace();
         }
     }
+
+    // method for calculating the balance amount
+
     
     // method for displaying the transaction history for the lender
     public void showTransactionHistory(int userId){
@@ -237,6 +290,24 @@ public class LenderAction extends ActionSupport{
         return null;
     }
 
+    // method used to display the lending status of the loans given by the lender
+    private void showLendingStatus(int userId){
+        String query = "select loans.borrower_id, updated_at, interest_rate, loan_grant_amount, DATE_ADD(updated_at, INTERVAL "
+                    +" loan_tenure_months MONTH) AS due_date from loan_distribution inner join loans on loan_distribution.loan_id = "
+                    +" loans.loan_id inner join lenders on lenders.lender_id=loan_distribution.lender_id where lenders.user_id = ? ";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+
+            
+            
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public String execute(){
@@ -249,8 +320,11 @@ public class LenderAction extends ActionSupport{
                 setUserId(sessionUser.getUserId());
 
                 getAmountInfo();
+                getLenderIdOfUser(getUserId());
+                showLendingStatus(getUserId());
                 getLoanRequests();
                 showTransactionHistory(getUserId());
+
 
                 return "success";
             }

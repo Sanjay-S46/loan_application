@@ -118,7 +118,7 @@ public class LoanAction extends ActionSupport{
 
             if (resultSet.next()) {
                 setLoanId(resultSet.getInt(1));
-                long balanceAmount = resultSet.getLong(2);
+                long balanceAmount = resultSet.getLong(2) - resultSet.getLong(5);
                 String status;
                 if (balanceAmount != 0) {
                     status = "Partially Funded";
@@ -138,7 +138,7 @@ public class LoanAction extends ActionSupport{
 
                 System.out.println("All the details are displayed from the tables");
 
-                acceptLoan(status);
+                acceptLoan(status,balanceAmount);
             }
         } 
         catch (Exception e) {
@@ -147,15 +147,16 @@ public class LoanAction extends ActionSupport{
     }
 
     // accepting the loan that the borrower selected
-    private void acceptLoan(String status){
+    private void acceptLoan(String status, long balanceAmount){
 
-        String query = "update loans set status = ? where loan_id = ?";
+        String query = "update loans set status = ?, balance_amount = ? where loan_id = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
             preparedStatement.setString(1, status);
-            preparedStatement.setInt(2, getLoanId());
+            preparedStatement.setLong(2, balanceAmount);
+            preparedStatement.setInt(3, getLoanId());
 
             int result = preparedStatement.executeUpdate();
 
@@ -163,6 +164,7 @@ public class LoanAction extends ActionSupport{
                 System.out.println("Loans table status has been updated..");
                 updateLenderAmount();
                 updateLoanBalance();
+                updateLoanDistribution();
             }
         } 
         catch (Exception e) {
@@ -185,7 +187,7 @@ public class LoanAction extends ActionSupport{
 
             if (result > 0) {
                 System.out.println("Lenders amount value has been updated..");
-                updateTransactionHistory("lender", getLenderId());
+                updateTransactionHistory("lender", getLenderUserId());
                 
             }
         } 
@@ -213,10 +215,30 @@ public class LoanAction extends ActionSupport{
 
             if (result > 0) {
                 System.out.println("Borrowers current loan balance is updated..");
-                updateTransactionHistory("borrower", getBorrowerId());
+                updateTransactionHistory("borrower", getBorrowerUserId());
                 insertEMI();
             }
 
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateLoanDistribution(){
+        String query = "update loan_distribution set is_loan_accepted=1 where distribution_id = ?";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setInt(1, getDistributionId());
+
+            int result = preparedStatement.executeUpdate();
+
+            if (result > 0) {
+                System.out.println("Loan distribution table updated..");
+            }
+            
         } 
         catch (Exception e) {
             e.printStackTrace();
@@ -257,8 +279,8 @@ public class LoanAction extends ActionSupport{
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
             preparedStatement.setInt(1, id);
-            preparedStatement.setInt(2, getLenderUserId());
-            preparedStatement.setInt(3, getBorrowerUserId());
+            preparedStatement.setInt(2, getLenderId());
+            preparedStatement.setInt(3, getBorrowerId());
             preparedStatement.setLong(4, getLoanGrantedAmount());
 
             if (role.equals("lender")) {
@@ -268,9 +290,11 @@ public class LoanAction extends ActionSupport{
                 preparedStatement.setString(5, "Borrowed");
             }
             
-            preparedStatement.executeUpdate();
+            int result = preparedStatement.executeUpdate();
 
-            System.out.println("Transaction table is updated.. ");
+            if (result > 0) {
+                System.out.println("Transaction table is updated.. ");
+            }
         } 
         catch (Exception e) {
             e.printStackTrace();

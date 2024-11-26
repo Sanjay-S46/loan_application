@@ -21,7 +21,6 @@ public class LendLoanAction extends ActionSupport{
     private int interestRate;
     private long grantLoanAmount;
     private long requestedAmount;
-    private long balanceAmount;
     private int loanMonth;
     private int loanId;
 
@@ -40,9 +39,6 @@ public class LendLoanAction extends ActionSupport{
     }
     public void setRequestedAmount(long requestedAmount){
         this.requestedAmount = requestedAmount;
-    }
-    public void setBalanceAmount(long balanceAmount){
-        this.balanceAmount = balanceAmount;
     }
     public void setLoanMonth(int loanMonth){
         this.loanMonth = loanMonth;
@@ -67,9 +63,6 @@ public class LendLoanAction extends ActionSupport{
     public long getRequestedAmount(){
         return requestedAmount;
     }
-    public long getBalanceAmount(){
-        return balanceAmount;
-    }
     public int getLoanMonth(){
         return loanMonth;
     }
@@ -84,8 +77,6 @@ public class LendLoanAction extends ActionSupport{
 
         // checking for the correct requested amount or 10% of the requested amount 
         if ((grantAmount == reqAmount) || (grantAmount > reqAmount*0.1 && grantAmount <= reqAmount)) { 
-            balanceAmount = reqAmount - grantAmount;
-            setBalanceAmount(balanceAmount);
             return true;
         }
 
@@ -123,24 +114,25 @@ public class LendLoanAction extends ActionSupport{
     }
 
     private void loanAccept(){
-        String query = "insert into loan_distribution (loan_id, lender_id, borrower_id, interest_rate, loan_grant_amount, balance_amount)"
-                        + " values (?,?,?,?,?,?) ";
+        String query = "insert into loan_distribution (loan_id, lender_id, borrower_id, interest_rate, loan_grant_amount)"
+                        + " values (?,?,?,?,?   ) ";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
 
+            int lenderId = getIdFromUser(getUsername(),"lender");
+
             preparedStatement.setInt(1, getLoanId());
-            preparedStatement.setInt(2, getIdFromUser(getUsername(),"lender"));
+            preparedStatement.setInt(2, lenderId);
             preparedStatement.setInt(3, getIdFromUser(getBorrowerName(),"borrower"));
             preparedStatement.setInt(4, getInterestRate());
             preparedStatement.setLong(5, getGrantLoanAmount());
-            preparedStatement.setLong(6, getBalanceAmount());
 
             int result = preparedStatement.executeUpdate();
 
             if (result > 0) {
-                
+                insertLenderDetails(getLoanId(),lenderId);
                 System.out.println("Loan accepted");
             }
         } 
@@ -149,6 +141,27 @@ public class LendLoanAction extends ActionSupport{
         }
     }
     
+
+    // inserting the lender id in the lender details
+    private void insertLenderDetails(int loanId,int lenderId){
+        String query = "update loans set lender_list = CONCAT(IFNULL(lender_list, ''), ?, ',')  where loan_id = ?";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setInt(1, lenderId);
+            preparedStatement.setInt(2, loanId);
+
+            int result = preparedStatement.executeUpdate();
+
+            if (result > 0) {
+                System.out.println("Inserted into lenders list");
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     @Override 
     public String execute(){    

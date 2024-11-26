@@ -82,6 +82,9 @@
                         <div>
                             <p><strong>Borrower : </strong> <s:property value="username"/></p>
                             <p><strong>Amount requested : </strong> <i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="requestedAmount"/></p>
+                            <s:if test="balanceAmount!=0">
+                                <p><strong>Balance amount : </strong> <i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="balanceAmount"/></p>
+                            </s:if>
                             <p><strong>Loan purpose : </strong> <s:property value="loanPurpose"/></p>
                             <p><strong>Loan Term : </strong> <s:property value="loanMonth"/> months</p>
                         </div>

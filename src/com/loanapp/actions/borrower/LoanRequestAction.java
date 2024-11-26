@@ -52,8 +52,8 @@ public class LoanRequestAction extends ActionSupport implements ModelDriven<Loan
 
     // applying loan form
     private void applyForLoan(int userId){
-        String query = "insert into loans (borrower_id, requested_amount, loan_type, loan_purpose, loan_tenure_months ) "
-                    + "values ( (select borrower_id from borrowers where user_id = ?) , ?, ? ,?, ? )";
+        String query = "insert into loans (borrower_id, requested_amount, loan_type, loan_purpose, loan_tenure_months,balance_amount) "
+                    + "values ( (select borrower_id from borrowers where user_id = ?) , ?, ? ,?, ?, ?)";
 
         try (
             Connection conn = db.getConnection();
@@ -65,6 +65,7 @@ public class LoanRequestAction extends ActionSupport implements ModelDriven<Loan
             preparedStatement.setString(3, loan.getLoanType());
             preparedStatement.setString(4, loan.getLoanPurpose());
             preparedStatement.setInt(5, loan.getLoanMonth());
+            preparedStatement.setLong(6, loan.getLoanAmount());
 
             int result = preparedStatement.executeUpdate();
 
