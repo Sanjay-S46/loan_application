@@ -26,7 +26,10 @@ public class RoleBasedInterceptor implements Interceptor{
         String namespace = invocation.getProxy().getNamespace();
         
         if ((namespace.equals("/admin") && !userType.equals("admin")) ||
-            (namespace.equals("/verifier") && !userType.equals("verifier"))) {
+            (namespace.equals("/verifier") && !userType.equals("verifier")) ||
+            (namespace.equals("/borrower") && !userType.equals("borrower")) ||
+            (namespace.equals("/lender") && !userType.equals("lender"))
+        ) {
             // Unauthorized access
             return "unauthorized"; 
         }

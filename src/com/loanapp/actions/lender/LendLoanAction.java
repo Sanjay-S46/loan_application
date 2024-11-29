@@ -23,6 +23,7 @@ public class LendLoanAction extends ActionSupport{
     private long requestedAmount;
     private int loanMonth;
     private int loanId;
+    private int userId;
 
     // setters
     public void setUsername(String username){
@@ -45,6 +46,9 @@ public class LendLoanAction extends ActionSupport{
     }
     public void setLoanId(int loanId){
         this.loanId = loanId;
+    }
+    public void setUserId(int userId){
+        this.userId = userId;
     }
 
     // getter
@@ -69,11 +73,19 @@ public class LendLoanAction extends ActionSupport{
     public int getLoanId(){
         return loanId;
     }
+    public int getUserId(){
+        return userId;
+    }
 
     private boolean checkForGrantLoan(){
     
+        long availableAmount = getAvailableAmount(getUserId());
         long grantAmount = getGrantLoanAmount();
         long reqAmount = getRequestedAmount();
+
+        if (availableAmount == -1 || availableAmount < grantAmount) {
+            return false;
+        }
 
         // checking for the correct requested amount or 10% of the requested amount 
         if ((grantAmount == reqAmount) || (grantAmount > reqAmount*0.1 && grantAmount <= reqAmount)) { 
@@ -81,6 +93,26 @@ public class LendLoanAction extends ActionSupport{
         }
 
         return false;
+    }
+
+    private long getAvailableAmount(int userId){
+        String query = "select available_funds from lenders where user_id = ?";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getLong(1);
+            }
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     private int getIdFromUser(String name , String userType){
@@ -115,7 +147,7 @@ public class LendLoanAction extends ActionSupport{
 
     private void loanAccept(){
         String query = "insert into loan_distribution (loan_id, lender_id, borrower_id, interest_rate, loan_grant_amount)"
-                        + " values (?,?,?,?,?   ) ";
+                        + " values (?,?,?,?,?) ";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -169,6 +201,8 @@ public class LendLoanAction extends ActionSupport{
         if (session != null) {
             User sessionUser = (User) session.getAttribute("userSession");
             if (sessionUser!=null && sessionUser.getUsername() != null) {
+
+                setUserId(sessionUser.getUserId());
                 setUsername(sessionUser.getUsername());
 
                 if (checkForGrantLoan()) {

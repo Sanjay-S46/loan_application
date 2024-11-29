@@ -142,6 +142,17 @@
             <result name="error">/error.jsp</result>
         </action>
 
+        <!-- payment actions -->
+        <action name="payment_page" class="com.loanapp.actions.borrower.PaymentAction">
+            <result name="success">/jsp/borrower/payment.jsp</result>
+            <result name="error">/error.jsp</result>
+        </action>
+
+        <action name="payment" class="com.loanapp.actions.borrower.PaymentAction" method="amountPaymentTask">
+            <result name="success" type="redirect">home</result>
+            <result name="error">/error.jsp</result>
+        </action>
+
         <!-- borrower profile actions -->
 
         <action name="userProfile" class="com.loanapp.actions.borrower.BorrowerProfileAction">

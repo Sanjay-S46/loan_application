@@ -137,7 +137,7 @@
 
                 <div class="modal-buttons">
                     <input type="submit" class="btn-submit" value="Submit" />
-                    <input type="submit" class="btn-cancel" value="Cancel" onclick="closeDepositModal()" />
+                    <input type="button" class="btn-cancel" value="Cancel" onclick="closeDepositModal()" />
                 </div>
             </form>
         </div>

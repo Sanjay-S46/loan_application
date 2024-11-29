@@ -24,6 +24,7 @@ class EmiDetail{
     private long emiPaid;
     private long emiPending;
     private Date date;
+    private int loanId;
 
     // setters
     public void setLoanAmount(long loanAmount){
@@ -41,6 +42,9 @@ class EmiDetail{
     public void setDate(Date date){
         this.date = date;
     }
+    public void setLoanId(int loanId){
+        this.loanId = loanId;
+    }
 
     // getters
     public long getLoanAmount(){
@@ -57,6 +61,9 @@ class EmiDetail{
     }
     public Date getDate(){
         return date;
+    }
+    public int getLoanId(){
+        return loanId;
     }
 }
 
@@ -259,7 +266,8 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan> {
 
     // getting the information of the EMI'S of the borrower
     public void getEmiInfo(){
-        String query = "select emi_amount, amount_paid, due_date, requested_amount from EMIs inner join loans on EMIs.loan_id = loans.loan_id where borrower_id = ?";
+        String query = "select sum(emi_amount), sum(amount_paid), min(due_date), requested_amount, EMIs.loan_id from EMIs inner join "
+                        +" loans on EMIs.loan_id = loans.loan_id where borrower_id = ? and EMIs.status='Due' group by EMIs.loan_id";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -280,6 +288,7 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan> {
                 emiDetail.setEmiPending(pending);
                 emiDetail.setDate(resultSet.getDate(3));
                 emiDetail.setLoanAmount(resultSet.getLong(4));
+                emiDetail.setLoanId(resultSet.getInt(5));
 
                 emiDetails.add(emiDetail);
             }

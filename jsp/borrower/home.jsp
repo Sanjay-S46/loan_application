@@ -59,17 +59,24 @@
                             <s:set var="counter" value="0" />
                             <s:iterator value="emiDetails">
                                 <s:set var="counter" value="#counter + 1" />
-                                <tr>
+                                <tr onclick="gotoPaymentPage('<s:property value='loanId' />' , '<s:property value='emiAmount' />')">
                                     <td><s:property value="#counter" /> </td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="loanAmount" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiAmount" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiPaid" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiPending" /></td>
                                     <td><s:property value="date" /></td>
-                                </tr>
+                                </tr>            
                             </s:iterator>
                         </tbody>
                     </table>
+
+                    <%-- form that navigates to the payment page --%>
+                    <form action="payment_page" method="post" id="goto-payment-form">
+                        <input type="hidden" name="loanId" id="hiddenLoanId" value="" />
+                        <input type="hidden" name="emiAmount" id="emiAmount" value="" />
+                    </form>
+
                 </div>
             </s:else>
         </div>
@@ -142,9 +149,12 @@
                             </s:iterator>
                         </tbody>
                     </table>
+
+                    <%-- form that is used to send the load id and fetch the loan details in the next page --%>
                     <form action="show_loan_detail" method="post" id="loanForm">
                         <input type="hidden" name="loanId" id="hiddenLoanId" value="" />
                     </form>
+
                 </s:else>
             </div>
         </div>
@@ -198,12 +208,18 @@
     </script>
     <script>
         function submitLoanForm(loanId) {
-            // Set the loanId in the hidden input field
             document.getElementById('hiddenLoanId').value = loanId;
-
-            // Submit the form
             document.getElementById('loanForm').submit();
         }
     </script>
+
+    <script>
+        function gotoPaymentPage(loanId,emiAmount) {
+            document.getElementById('hiddenLoanId').value = loanId;
+            document.getElementById('emiAmount').value = emiAmount;
+            document.getElementById('goto-payment-form').submit();
+        }
+    </script>
+
 </body>
 </html>

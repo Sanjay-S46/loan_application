@@ -47,6 +47,7 @@ public class LoanRequestAction extends ActionSupport implements ModelDriven<Loan
         catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("Max amount less than request amount so rejected..");
         return false;
     }
 

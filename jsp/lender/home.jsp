@@ -41,33 +41,37 @@
             </div>
 
             <div class="section-title">Lending Status</div>
-            <table class="lending-status-table">
-                <thead>
-                    <tr>
-                        <th>Borrower</th>
-                        <th>Date</th>
-                        <th>Amount Lended</th>
-                        <th>Interest Rate</th>
-                        <th>Due Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Jane Smith</td>
-                        <td>01/01/2024</td>
-                        <td>$5,000</td>
-                        <td>10%</td>
-                        <td>01/01/2025</td>
-                    </tr>
-                    <tr>
-                        <td>John Doe</td>
-                        <td>15/02/2024</td>
-                        <td>$3,000</td>
-                        <td>8%</td>
-                        <td>15/02/2025</td>
-                    </tr>
-                </tbody>
-            </table>
+            <s:if test="statusList.size()==0">
+                <h2>No lending status available at the moment..</h2>
+            </s:if>
+            <s:else>
+                <table class="lending-status-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Borrower</th>
+                            <th>Date</th>
+                            <th>Amount Lended</th>
+                            <th>Interest Rate</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <s:set var="counter" value="0" />
+                        <s:iterator value="statusList" >
+                            <s:set var="counter" value="#counter + 1" />
+                            <tr>
+                                <td><s:property value="#counter" /></td>
+                                <td><s:property value="borrowerName" /></td>
+                                <td><s:property value="borrowDate" /></td>
+                                <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="amount" /></td>
+                                <td><s:property value="interestRate" /> %</td>
+                                <td><s:property value="dueDate" /></td>
+                            </tr>
+                        </s:iterator>
+                    </tbody>
+                </table>
+            </s:else>
         </div>
 
         <!-- Borrow Requests Section -->

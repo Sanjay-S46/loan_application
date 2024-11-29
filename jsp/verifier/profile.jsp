@@ -184,7 +184,7 @@
     <div class="navbar">
         <h1>Loan Application</h1>
         <div class="buttons">
-            <a href='<s:url action="home" />' id="home-icon"><i class="fa-solid fa-house"></i></a>
+            <a href='<s:url action="home" />' id="home-icon"><i class="fa fa-house"></i></a>
             <a href="<s:url action='logout'/>" id="logout-button">Logout</a>
         </div>
     </div>
