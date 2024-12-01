@@ -163,10 +163,11 @@
         <form action="payment" method="post">
             
             <input type="hidden" name="emiAmount" value="<s:property value='emiAmount' />" required>
+            <input type="hidden" name="emiPending" value="<s:property value='emiPending' />" required>
             <input type="hidden" name="loanId" value="<s:property value='loanId' />" required>
 
-            <div class="input-container">
-                <input type="text" class="input-field" placeholder="Amount" name="payingAmount" required>
+            <div class="input-container"> 
+                <input type="text" class="input-field" placeholder="Amount" name="payingAmount" value="<s:property value='emiPending' />" required>
                 <i class="fas fa-dollar-sign input-icon"></i>
             </div>
 

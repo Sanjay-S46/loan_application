@@ -29,6 +29,7 @@ public class LoanAction extends ActionSupport{
     private int lenderUserId;
     private int borrowerUserId;
     private long maxLoanAmount;
+    private int month;
 
     // setters
     public void setEmi(int emi){
@@ -63,6 +64,9 @@ public class LoanAction extends ActionSupport{
     }
     public void setMaxLoanAmount(long maxLoanAmount){
         this.maxLoanAmount = maxLoanAmount;
+    }
+    public void setMonth(int month){
+        this.month = month;
     }
 
     // getters
@@ -99,12 +103,15 @@ public class LoanAction extends ActionSupport{
     public long getMaxLoanAmount(){
         return maxLoanAmount;
     }
+    public int getMonth(){
+        return month;
+    }
 
     // method used for getting all the details used for updating the loan details
     private void getLoanDistributionInfo(int distributionId){
         String query = "select loans.loan_id, balance_amount, lenders.lender_id, borrowers.borrower_id, loan_grant_amount, "
-                    + " available_funds, current_loan_balance, lenders.user_id, borrowers.user_id, max_loan_amount from "
-                    + " loan_distribution inner join loans on loan_distribution.loan_id=loans.loan_id inner join lenders on "
+                    + " available_funds, current_loan_balance, lenders.user_id, borrowers.user_id, max_loan_amount, loan_tenure_months "
+                    + " from loan_distribution inner join loans on loan_distribution.loan_id=loans.loan_id inner join lenders on "
                     + " lenders.lender_id=loan_distribution.lender_id inner join borrowers on borrowers.borrower_id = "
                     + " loan_distribution.borrower_id where distribution_id = ?"; 
 
@@ -135,6 +142,7 @@ public class LoanAction extends ActionSupport{
                 setLenderUserId(resultSet.getInt(8));
                 setBorrowerUserId(resultSet.getInt(9));
                 setMaxLoanAmount(resultSet.getLong(10));
+                setMonth(resultSet.getInt(11));
 
                 System.out.println("All the details are displayed from the tables");
 
@@ -226,12 +234,17 @@ public class LoanAction extends ActionSupport{
     }
 
     private void updateLoanDistribution(){
-        String query = "update loan_distribution set is_loan_accepted=1 where distribution_id = ?";
+        String query = "update loan_distribution set is_loan_accepted=1, remaining_principle_amount=?, emi=?, remaining_months=? "
+                    +" where distribution_id = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
-            preparedStatement.setInt(1, getDistributionId());
+
+            preparedStatement.setLong(1, getLoanGrantedAmount());
+            preparedStatement.setInt(2, getEmi());
+            preparedStatement.setInt(3, getMonth());
+            preparedStatement.setInt(4, getDistributionId());
 
             int result = preparedStatement.executeUpdate();
 

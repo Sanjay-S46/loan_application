@@ -59,7 +59,9 @@
                             <s:set var="counter" value="0" />
                             <s:iterator value="emiDetails">
                                 <s:set var="counter" value="#counter + 1" />
-                                <tr onclick="gotoPaymentPage('<s:property value='loanId' />' , '<s:property value='emiAmount' />')">
+                                <tr onclick="gotoPaymentPage('<s:property value='loanId' />' , 
+                                                            '<s:property value='emiAmount' />' ,
+                                                            '<s:property value='emiPending' />')">
                                     <td><s:property value="#counter" /> </td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="loanAmount" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiAmount" /></td>
@@ -74,6 +76,7 @@
                     <%-- form that navigates to the payment page --%>
                     <form action="payment_page" method="post" id="goto-payment-form">
                         <input type="hidden" name="loanId" id="hiddenLoanId" value="" />
+                        <input type="hidden" name="emiPending" id="emiPending" value="" />
                         <input type="hidden" name="emiAmount" id="emiAmount" value="" />
                     </form>
 
@@ -214,9 +217,10 @@
     </script>
 
     <script>
-        function gotoPaymentPage(loanId,emiAmount) {
+        function gotoPaymentPage(loanId,emiAmount,emiPending) {
             document.getElementById('hiddenLoanId').value = loanId;
             document.getElementById('emiAmount').value = emiAmount;
+            document.getElementById('emiPending').value = emiPending;
             document.getElementById('goto-payment-form').submit();
         }
     </script>
