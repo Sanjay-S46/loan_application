@@ -1,11 +1,9 @@
 package com.loanapp.models;
 
-import java.sql.Date;
-
 public class TransactionHistory{
 
     private long amount;
-    private Date date;
+    private String date;
     private String transactionType;
     private String name;
 
@@ -13,7 +11,7 @@ public class TransactionHistory{
     public void setAmount(long amount){
         this.amount = amount;
     }
-    public void setDate(Date date){
+    public void setDate(String date){
         this.date = date;
     }
     public void setTransactionType(String transactionType){
@@ -27,7 +25,7 @@ public class TransactionHistory{
     public long getAmount(){
         return amount;
     }
-    public Date getDate(){
+    public String getDate(){
         return date;
     }
     public String getTransactionType(){

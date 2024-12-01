@@ -131,11 +131,13 @@ public class LenderAction extends ActionSupport{
     private ArrayList<LoanDetail> loanDetails = new ArrayList<>();
     private ArrayList<TransactionHistory> history = new ArrayList<>();
     private ArrayList<LendingStatus> statusList = new ArrayList<>();
+    private ArrayList<TransactionHistory> report = new ArrayList<>();
 
     private String username;
     private long availableFunds;
     private int userId;
     private int lenderId;
+    private long totalEarnings;
 
     // setters
     public void setUsername(String username){
@@ -153,11 +155,17 @@ public class LenderAction extends ActionSupport{
     public void setHistory(ArrayList<TransactionHistory> history){
         this.history = history;
     }
+    public void setReport(ArrayList<TransactionHistory> report){
+        this.report = report;
+    }
     public void setStatusList(ArrayList<LendingStatus> statusList){
         this.statusList = statusList;
     }
     public void setLenderId(int lenderId){
         this.lenderId = lenderId;
+    }
+    public void setTotalEarnings(long totalEarnings){
+        this.totalEarnings = totalEarnings;
     }
 
     // getters
@@ -176,11 +184,17 @@ public class LenderAction extends ActionSupport{
     public ArrayList<TransactionHistory> getHistory(){
         return history;
     }
+    public ArrayList<TransactionHistory> getReport(){
+        return report;
+    }
     public ArrayList<LendingStatus> getStatusList(){
         return statusList;
     }
     public int getLenderId(){
         return lenderId;
+    }
+    public long getTotalEarnings(){
+        return totalEarnings;
     }
 
     // method used for setting the username and fund amount to the home page of the lender
@@ -270,13 +284,46 @@ public class LenderAction extends ActionSupport{
         }
     }
 
-    // method for calculating the balance amount
+    // method for showing the report of the lender with total earings
+    public void getReportStatus(){
+        String query = "select username, amount, DATE_FORMAT(transaction_date, '%d/%m/%y %h:%i %p') from transaction_history inner join borrowers on  "
+                    +" transaction_history.borrower_id=borrowers.borrower_id inner join users on borrowers.user_id=users.user_id " 
+                    +" where transaction_type='EMI Received' and transaction_history.user_id=?";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+
+            preparedStatement.setInt(1, getUserId());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            long totalAmount = 0;
+
+            while (resultSet.next()) {
+                transaction = new TransactionHistory();
+
+                long amount = resultSet.getLong(2);
+                totalAmount += amount;
+
+                transaction.setName(resultSet.getString(1));
+                transaction.setAmount(amount);
+                transaction.setDate(resultSet.getString(3));
+
+                report.add(transaction);
+            }
+
+            setTotalEarnings(totalAmount);
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     
     // method for displaying the transaction history for the lender
     public void showTransactionHistory(int userId){
-        String query = "select * from transaction_history inner join users on transaction_history.user_id=users.user_id "
-                        + " where users.user_id = ?";
+        String query = "select amount, transaction_type, DATE_FORMAT(transaction_date, '%d/%m/%y'), borrower_id from "
+                    +" transaction_history inner join users on transaction_history.user_id=users.user_id where users.user_id = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -287,27 +334,24 @@ public class LenderAction extends ActionSupport{
             while (resultSet.next()) {
 
                 transaction = new TransactionHistory();
-                transaction.setAmount(resultSet.getLong("amount"));
-                transaction.setTransactionType(resultSet.getString("transaction_type"));
-                transaction.setDate(resultSet.getDate("transaction_date"));
+                transaction.setAmount(resultSet.getLong(1));
+                transaction.setTransactionType(resultSet.getString(2));
+                transaction.setDate(resultSet.getString(3));
 
                 if (transaction.getTransactionType().equals("Deposit")) {
                     transaction.setName(getUsername() + " (You)");
                 }
                 else{
-                    String borrowerName = getBorrowerName(resultSet.getInt("borrower_id"));
+                    String borrowerName = getBorrowerName(resultSet.getInt(4));
                     transaction.setName(borrowerName);
                 }
 
                 // adding to the history array list
                 history.add(transaction);
             }
-            
-            System.out.println("Transaction history displayed.....");
         } 
         catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Details cannot be fetched");
         }
     }
 
@@ -379,8 +423,8 @@ public class LenderAction extends ActionSupport{
                 getLenderIdOfUser(getUserId());
                 showLendingStatus(getUserId());
                 getLoanRequests();
+                getReportStatus();
                 showTransactionHistory(getUserId());
-
 
                 return "success";
             }

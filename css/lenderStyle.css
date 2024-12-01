@@ -209,39 +209,6 @@ body {
     color: green;
 }
 
-
-/* Report Section */
-.report-section {
-    margin-top: 30px;
-}
-
-.report-section .transaction {
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.report-section .transaction p {
-    margin: 0;
-    font-size: 18px;
-}
-
-.report-section .transaction .amount {
-    font-weight: bold;
-    color: green;
-    text-align: right;
-    font-size: 20px;
-}
-
-.report-section .transaction .date {
-    color: #666;
-    font-size: 16px;
-}
-
 /* Transaction History Section */
 .history-table table {
     width: 100%;

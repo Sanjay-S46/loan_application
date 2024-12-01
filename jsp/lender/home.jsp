@@ -5,13 +5,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrower Home</title>
+    <title>Lender Home</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> 
     <link rel="stylesheet" href="/loanApplication/css/lenderStyle.css">
 
     <style>
         
+        /* Report Section */
+        .report-section {
+            margin-top: 30px;
+        }
 
+        .report-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .report-summary .section-title {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .report-summary .total-earnings {
+            font-size: 20px;
+            font-weight: bold;
+            color: green;
+            text-align: right;
+        }
+
+        .report-section .transaction {
+            display: grid;
+            grid-template-columns: 1fr auto; 
+            gap: 10px; 
+            align-items: center; 
+            padding: 15px;
+            background-color: #e2e6ea;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-section .borrower-details p {
+            margin: 0;
+            font-size: 22px;
+            margin-bottom:8px;
+        }
+
+        .report-section .borrower-details .date {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .report-section .amount-details {
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .report-section .amount-details .amount {
+            color: green;
+        }
     </style>
 </head>
 
@@ -114,20 +168,30 @@
 
         <!-- Report Section -->
         <div class="section" id="report">
-            <div class="section-title">Report</div>
-            <div class="report-section">
-                <div class="transaction">
-                    <p>Borrower: John Doe</p>
-                    <p class="date">01/01/2024 12:00 PM</p>
-                    <p class="amount">$10,000</p>
-                </div>
-                <div class="transaction">
-                    <p>Borrower: Jane Smith</p>
-                    <p class="date">02/01/2024 3:45 PM</p>
-                    <p class="amount">$8,000</p>
-                </div>
+            <div class="report-summary">
+                <div class="section-title">Report</div>
+                <div class="total-earnings">Total Earnings: <i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="totalEarnings" /></div>
             </div>
+            <s:if test="report.size()==0">
+                <h2>No earnings at the moment...</h2>
+            </s:if>
+            <s:else>
+                <s:iterator value="report">
+                    <div class="report-section">
+                        <div class="transaction">
+                            <div class="borrower-details">
+                                <p>Borrower: <s:property value="name" /></p>
+                                <p class="date"><s:property value="date" /></p>
+                            </div>
+                            <div class="amount-details">
+                                <p class="amount"><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="amount" /></p>
+                            </div>
+                        </div>
+                    </div>
+                </s:iterator>
+            </s:else>
         </div>
+
 
         <!-- Transaction History Section -->
         <div class="section" id="transaction-history">

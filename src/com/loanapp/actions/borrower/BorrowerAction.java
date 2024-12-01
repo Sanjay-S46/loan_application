@@ -211,9 +211,9 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan> {
         }
     }
 
-
+    // method for displaying the transaction history to the particular user
     public void showTransactionHistory(int userId){
-        String query = "select * from transaction_history inner join users on transaction_history.user_id=users.user_id "
+        String query = "select amount, transaction_type, DATE_FORMAT(transaction_date, '%d/%m/%y'), lender_id from transaction_history inner join users on transaction_history.user_id=users.user_id "
                         + " where users.user_id = ? and transaction_type not in ('Deposit')";
         try (
             Connection conn = db.getConnection();
@@ -224,11 +224,11 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan> {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 transaction = new TransactionHistory();
-                transaction.setAmount(resultSet.getLong("amount"));
-                transaction.setTransactionType(resultSet.getString("transaction_type"));
-                transaction.setDate(resultSet.getDate("transaction_date"));
+                transaction.setAmount(resultSet.getLong(1));
+                transaction.setTransactionType(resultSet.getString(2));
+                transaction.setDate(resultSet.getString(3));
 
-                String lender = getLenderName(resultSet.getInt("lender_id"));
+                String lender = getLenderName(resultSet.getInt(4));
                 transaction.setName(lender);
     
                 // adding to the history array list

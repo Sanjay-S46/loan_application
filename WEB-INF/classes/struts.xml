@@ -127,6 +127,8 @@
             <result name="error">/login.jsp</result>
         </action>
 
+        <!-- loan actions -->
+        
         <action name="applyLoan" class="com.loanapp.actions.borrower.LoanRequestAction">
             <result name="success" type="redirect">home</result>
             <result name="error">/unauthorized.jsp</result>
