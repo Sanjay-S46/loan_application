@@ -10,6 +10,16 @@
     <link rel="stylesheet" href="/loanApplication/css/lenderStyle.css">
 
     <style>
+
+        .nav-links a{
+            cursor: pointer;
+        }
+
+        #lending-status{
+            font-size: 28px;
+            color: #007bff;
+            margin: 0;
+        }
         
         /* Report Section */
         .report-section {
@@ -94,7 +104,7 @@
                 <div>Available Amount: <strong><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="availableFunds" /></strong></div>
             </div>
 
-            <div class="section-title">Lending Status</div>
+            <div class="section-title"><h2 id="lending-status">Lending Status</h2></div>
             <s:if test="statusList.size()==0">
                 <h2>No lending status available at the moment..</h2>
             </s:if>

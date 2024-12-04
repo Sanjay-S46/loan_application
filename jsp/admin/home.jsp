@@ -8,6 +8,11 @@
     <title>Loan Application</title>
     <link rel="stylesheet" href="/loanApplication/css/adminStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .nav-links a{
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">

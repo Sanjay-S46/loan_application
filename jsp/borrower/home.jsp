@@ -10,7 +10,42 @@
     <link rel="stylesheet" href="/loanApplication/css/borrowerStyle.css">
 
     <style>
+        .nav-links a{
+            cursor: pointer;
+        }
+        
+        input[type="submit"] {
+            padding: 8px 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
 
+        /* Hover Effect */
+        button:hover, input[type="submit"]:hover {
+            transform: scale(1.05); 
+        }
+        /* Styling Pay Button */
+        input[type="submit"][value="Pay"] {
+            background-color: #28a745;
+        }
+
+        input[type="submit"][value="Pay"]:hover {
+            background-color: #218838; 
+        }
+
+        /* Styling View Button */
+        input[type="submit"][value="View"] {
+            background-color: #17a2b8; 
+        }
+
+        input[type="submit"][value="View"]:hover {
+            background-color: #138496; 
+        }
     </style>
 </head>
 
@@ -53,33 +88,32 @@
                                 <th>EMI Paid</th>
                                 <th>EMI Pending</th>
                                 <th>Due Date</th>
+                                <th>Option</th>
                             </tr>
                         </thead>
                         <tbody>
                             <s:set var="counter" value="0" />
                             <s:iterator value="emiDetails">
                                 <s:set var="counter" value="#counter + 1" />
-                                <tr onclick="gotoPaymentPage('<s:property value='loanId' />' , 
-                                                            '<s:property value='emiAmount' />' ,
-                                                            '<s:property value='emiPending' />')">
+                                <tr>
                                     <td><s:property value="#counter" /> </td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="loanAmount" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiAmount" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiPaid" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="emiPending" /></td>
                                     <td><s:property value="date" /></td>
+                                    <td>
+                                        <form action="payment_page" method="post">
+                                            <input type="hidden" name="loanId" value="<s:property value='loanId' />" />
+                                            <input type="hidden" name="emiPending" value="<s:property value='emiAmount' />" />
+                                            <input type="hidden" name="emiAmount" value="<s:property value='emiPending' />" />
+                                            <input type="submit" value="Pay" />
+                                        </form>
+                                    </td>
                                 </tr>            
                             </s:iterator>
                         </tbody>
                     </table>
-
-                    <%-- form that navigates to the payment page --%>
-                    <form action="payment_page" method="post" id="goto-payment-form">
-                        <input type="hidden" name="loanId" id="hiddenLoanId" value="" />
-                        <input type="hidden" name="emiPending" id="emiPending" value="" />
-                        <input type="hidden" name="emiAmount" id="emiAmount" value="" />
-                    </form>
-
                 </div>
             </s:else>
         </div>
@@ -102,17 +136,17 @@
 
                 <div class="form-group">
                     <label for="loan-purpose">Purpose of Loan:</label>
-                    <input type="text" id="loan-purpose" name="loanPurpose" placeholder="Enter the purpose of the loan">
+                    <input type="text" id="loan-purpose" name="loanPurpose" placeholder="Enter the purpose of the loan" required>
                 </div>
 
                 <div class="form-group">
                     <label for="loan-amount">Total Loan Amount:</label>
-                    <input type="number" id="loan-amount" name="loanAmount" placeholder="Enter total loan amount">
+                    <input type="number" id="loan-amount" name="loanAmount" placeholder="Enter total loan amount" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="loan-term">Loan Tenure (Months):</label>
-                    <input type="number" id="loan-term" name="loanMonth" placeholder="Enter loan term in months">
+                    <input type="number" id="loan-term" name="loanMonth" placeholder="Enter loan term in months" required>
                 </div>
 
                 <button class="submit-btn" type="submit">Submit Loan Request</button>
@@ -136,28 +170,29 @@
                                 <th>Months</th>
                                 <th>Loan Type</th>
                                 <th>Status</th>
+                                <th>Option</th>
                             </tr>
                         </thead>
                         <tbody>
                             <s:set var="counter" value="0" />
                             <s:iterator value="loans">
                                 <s:set var="counter" value="#counter + 1" />
-                                <tr onclick="submitLoanForm('<s:property value='loanId' />')">
+                                <tr>
                                     <td><s:property value="#counter" /></td>
                                     <td><i class="fa-solid fa-indian-rupee-sign"></i> <s:property value="loanAmount" /></td>
                                     <td><s:property value="loanMonth" /></td>
                                     <td><s:property value="loanType" /></td>
                                     <td><s:property value="status" /></td>
+                                    <td>
+                                        <form action="show_loan_detail" method="post">
+                                            <input type="hidden" name="loanId" value="<s:property value='loanId' />" />
+                                            <input type="submit" value="View" />
+                                        </form>
+                                    </td>
                                 </tr>
                             </s:iterator>
                         </tbody>
                     </table>
-
-                    <%-- form that is used to send the load id and fetch the loan details in the next page --%>
-                    <form action="show_loan_detail" method="post" id="loanForm">
-                        <input type="hidden" name="loanId" id="hiddenLoanId" value="" />
-                    </form>
-
                 </s:else>
             </div>
         </div>
@@ -207,21 +242,6 @@
                 section.classList.remove('active');
             });
             document.getElementById(sectionId).classList.add('active');
-        }
-    </script>
-    <script>
-        function submitLoanForm(loanId) {
-            document.getElementById('hiddenLoanId').value = loanId;
-            document.getElementById('loanForm').submit();
-        }
-    </script>
-
-    <script>
-        function gotoPaymentPage(loanId,emiAmount,emiPending) {
-            document.getElementById('hiddenLoanId').value = loanId;
-            document.getElementById('emiAmount').value = emiAmount;
-            document.getElementById('emiPending').value = emiPending;
-            document.getElementById('goto-payment-form').submit();
         }
     </script>
 

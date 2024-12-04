@@ -15,5 +15,4 @@ public class DatabaseConnection {
         Connection conn = DriverManager.getConnection(url,uname,pwd);
         return conn;
     }
-
 }

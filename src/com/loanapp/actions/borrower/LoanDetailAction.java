@@ -117,18 +117,18 @@ public class LoanDetailAction extends ActionSupport{
     }
     
 
-
     // method for getting the loan details from lender
     public void loanStatusFromLender(){
         String query = "select lender_id, interest_rate, loan_grant_amount, loan_tenure_months, loans.loan_id, distribution_id from "
                     + " loan_distribution inner join loans on loan_distribution.loan_id = loans.loan_id where loans.loan_id = ? and "
-                    +" status not in ('Fully Funded','Closed') and is_loan_accepted=0 ";
+                    +" status not in ('Fully Funded','Closed') and is_loan_accepted=0 and balance_amount >= loan_grant_amount";
 
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
         ) {
 
+            System.out.println("Loan id = " + getLoanId());
             preparedStatement.setInt(1, getLoanId());
 
             ResultSet resultSet = preparedStatement.executeQuery();

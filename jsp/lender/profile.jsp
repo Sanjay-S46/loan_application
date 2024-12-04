@@ -39,6 +39,10 @@
             margin-top: 20px;
         }
 
+        .action-buttons a{
+            text-decoration : none;
+        }
+
         .btn-action {
             background-color: #007bff; 
             color: white; 
@@ -100,7 +104,7 @@
             </table>
         </div>
         <div class="action-buttons">
-            <button class="btn-action" onclick="openDepositModal()">Deposit</button>
+            <a class="btn-action" href="<s:url action='payment_page' />" >Deposit</a>
             <button class="btn-action" onclick="openModal()">Change Password</button>
         </div>
     </div>
@@ -127,22 +131,6 @@
         </div>
     </div>
 
-    <!-- Modal for Deposit -->
-    <div id="depositModal" class="modal">
-        <div class="modal-content">
-            <h3>Deposit Funds</h3>
-            <form id="depositForm" action="deposit_amount" method="post">
-                <label for="depositAmount">Enter Deposit Amount</label>
-                <input type="number" id="depositAmount" name="depositAmount" placeholder="Enter amount" required>
-
-                <div class="modal-buttons">
-                    <input type="submit" class="btn-submit" value="Submit" />
-                    <input type="button" class="btn-cancel" value="Cancel" onclick="closeDepositModal()" />
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- JavaScript -->
     <script>
         function openModal() {
@@ -152,14 +140,7 @@
         function closeModal() {
             document.getElementById("changePasswordModal").classList.remove("show");
         }
-
-        function openDepositModal() {
-            document.getElementById("depositModal").classList.add("show");
-        }
-
-        function closeDepositModal() {
-            document.getElementById("depositModal").classList.remove("show");
-        }
+        
     </script>
 
 </body>

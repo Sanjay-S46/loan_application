@@ -83,7 +83,7 @@ public class LendLoanAction extends ActionSupport{
         long grantAmount = getGrantLoanAmount();
         long reqAmount = getRequestedAmount();
 
-        if (availableAmount == -1 || availableAmount < grantAmount) {
+        if (availableAmount < grantAmount) {
             return false;
         }
 
@@ -145,9 +145,20 @@ public class LendLoanAction extends ActionSupport{
         return 0;
     }
 
+    private int calculateEMI(long amount, int interestRate,int months){
+
+        double principal = (double) amount;
+        double interest = (double) interestRate;
+        double monthlyInterestRate = interest/12/100;
+
+        double value = Math.pow(1+monthlyInterestRate,months);
+        double emi = principal * monthlyInterestRate * value / (value-1);
+        return (int)Math.ceil(emi); 
+    }
+
     private void loanAccept(){
-        String query = "insert into loan_distribution (loan_id, lender_id, borrower_id, interest_rate, loan_grant_amount)"
-                        + " values (?,?,?,?,?) ";
+        String query = "insert into loan_distribution (loan_id, lender_id, borrower_id, interest_rate, loan_grant_amount, "
+                    + "remaining_principle_amount, emi, remaining_months) values (?,?,?,?,?,?,?,?) ";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -160,11 +171,16 @@ public class LendLoanAction extends ActionSupport{
             preparedStatement.setInt(3, getIdFromUser(getBorrowerName(),"borrower"));
             preparedStatement.setInt(4, getInterestRate());
             preparedStatement.setLong(5, getGrantLoanAmount());
+            preparedStatement.setLong(6, getGrantLoanAmount());
+            int amount = calculateEMI(getGrantLoanAmount(), getInterestRate(), getLoanMonth());
+            preparedStatement.setInt(7, amount);
+            preparedStatement.setInt(8, getLoanMonth());
 
             int result = preparedStatement.executeUpdate();
 
             if (result > 0) {
                 insertLenderDetails(getLoanId(),lenderId);
+                updateAvailableFunds(lenderId);
                 System.out.println("Loan accepted");
             }
         } 
@@ -173,6 +189,26 @@ public class LendLoanAction extends ActionSupport{
         }
     }
     
+    // method for updating the available funds
+    private void updateAvailableFunds(int lenderId){
+        String query = "update lenders set available_funds = available_funds - ? where lender_id = ?";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setLong(1, getGrantLoanAmount());
+            preparedStatement.setInt(2, lenderId);
+
+            int result = preparedStatement.executeUpdate();
+
+            if (result > 0) {
+                System.out.println("Lender's available amount updated..");
+            }
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     // inserting the lender id in the lender details
     private void insertLenderDetails(int loanId,int lenderId){
@@ -207,9 +243,11 @@ public class LendLoanAction extends ActionSupport{
 
                 if (checkForGrantLoan()) {
                     loanAccept();
+                    return "success";
                 }
-
-                return "success";
+                else{
+                    return "error";
+                }
             }
         }
         return "error";

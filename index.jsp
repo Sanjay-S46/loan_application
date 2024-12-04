@@ -37,7 +37,7 @@
         }
     </style>
 </head>
-<body>
+<body>  
     <div class="navbar">
         <h1>Loan Application</h1>
         <div class="buttons">

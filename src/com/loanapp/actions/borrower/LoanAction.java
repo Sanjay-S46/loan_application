@@ -3,8 +3,7 @@ package com.loanapp.actions.borrower;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDate;
-import java.sql.Date;
+import java.sql.Statement;
 
 import javax.servlet.http.HttpSession;
 
@@ -109,6 +108,7 @@ public class LoanAction extends ActionSupport{
 
     // method used for getting all the details used for updating the loan details
     private void getLoanDistributionInfo(int distributionId){
+
         String query = "select loans.loan_id, balance_amount, lenders.lender_id, borrowers.borrower_id, loan_grant_amount, "
                     + " available_funds, current_loan_balance, lenders.user_id, borrowers.user_id, max_loan_amount, loan_tenure_months "
                     + " from loan_distribution inner join loans on loan_distribution.loan_id=loans.loan_id inner join lenders on "
@@ -124,15 +124,21 @@ public class LoanAction extends ActionSupport{
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
+
                 setLoanId(resultSet.getInt(1));
                 long balanceAmount = resultSet.getLong(2) - resultSet.getLong(5);
                 String status;
-                if (balanceAmount != 0) {
-                    status = "Partially Funded";
+                //new condition added, but it may not be neccessary because in LoanDetailAction we filter that in loanStatusFromLender()
+                if (balanceAmount < 0) {
+                    System.out.println("Loan cannot be accepted");
+                    return;
                 }
-                else{
+                if (balanceAmount == 0) {
                     status = "Fully Funded";
                 }
+                else{
+                    status = "Partially Funded";
+                }  
 
                 setLenderId(resultSet.getInt(3));
                 setBorrowerId(resultSet.getInt(4));
@@ -146,6 +152,7 @@ public class LoanAction extends ActionSupport{
 
                 System.out.println("All the details are displayed from the tables");
 
+                // checkCanAcceptLoan();
                 acceptLoan(status,balanceAmount);
             }
         } 
@@ -154,10 +161,25 @@ public class LoanAction extends ActionSupport{
         }
     }
 
+    // method to check if the particular loan can be accepted or not
+    // private boolean checkCanAcceptLoan(){
+    //     String query = "";
+    //     try (
+    //         Connection conn = db.getConnection();
+    //         PreparedStatement preparedStatement = conn.prepareStatement(query);
+    //     ) {
+    //         return true;
+    //     } 
+    //     catch (Exception e) {
+    //         e.printStackTrace();
+    //     }
+    //     return false;
+    // }
+
     // accepting the loan that the borrower selected
     private void acceptLoan(String status, long balanceAmount){
 
-        String query = "update loans set status = ?, balance_amount = ? where loan_id = ?";
+        String query = "update loans set status = ?, balance_amount = ?, updated_at = CURRENT_TIMESTAMP where loan_id = ?";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -173,12 +195,54 @@ public class LoanAction extends ActionSupport{
                 updateLenderAmount();
                 updateLoanBalance();
                 updateLoanDistribution();
+                updateDueDate();
+                runScheduler();
             }
         } 
         catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    // method for activating mysql event scheduler that adds the emi every 1 month into the table
+    private void runScheduler() {
+
+        String eventName = "emi_for_loan_" + getLoanId() + "_with_lender_" + getLenderId();
+        int loanId = getLoanId();
+        int distId = getDistributionId();
+    
+        String endTimeQuery = "select DATE_SUB(loan_due_date, INTERVAL 1 MONTH) AS end_time FROM loans WHERE loan_id = " + loanId;
+    
+        try (
+            Connection conn = db.getConnection();
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(endTimeQuery);
+        ) {
+            if (rs.next()) {
+                String endTime = rs.getString("end_time");
+    
+                String query = "CREATE EVENT " + eventName + " "
+                        + "ON SCHEDULE "
+                        + "EVERY 1 MONTH "
+                        + "STARTS CURRENT_TIMESTAMP "
+                        + "ENDS TIMESTAMP('" + endTime + "') "
+                        + "DO "
+                        + "BEGIN "
+                        + "    INSERT INTO EMIs (loan_id, emi_amount) "
+                        + "    SELECT loan_id, emi FROM loan_distribution WHERE distribution_id = " + distId + "; "
+                        + "    UPDATE EMIs "
+                        + "    SET due_date = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) "
+                        + "    WHERE due_date IS NULL; "
+                        + "END;";
+    
+                statement.executeUpdate(query);
+                System.out.println("Scheduler has been set successfully.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
 
     // update the lender table's fund amount that is deduct from it
     private void updateLenderAmount(){
@@ -224,7 +288,7 @@ public class LoanAction extends ActionSupport{
             if (result > 0) {
                 System.out.println("Borrowers current loan balance is updated..");
                 updateTransactionHistory("borrower", getBorrowerUserId());
-                insertEMI();
+                //insertEMI();
             }
 
         } 
@@ -258,30 +322,6 @@ public class LoanAction extends ActionSupport{
         }
     }
 
-    // insert into the emi table based on the selected loan
-    private void insertEMI(){
-        String query = "insert into EMIs (loan_id, due_date, emi_amount) values (?,?,?) ";
-        try (
-            Connection conn = db.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement(query);
-        ) {
-
-            LocalDate currentDate = LocalDate.now();
-            LocalDate dueDate = currentDate.plusMonths(1);
-
-            preparedStatement.setInt(1, getLoanId());
-            preparedStatement.setDate(2, Date.valueOf(dueDate));
-            preparedStatement.setLong(3, getEmi());
-            int result = preparedStatement.executeUpdate();
-            if (result > 0) {
-                System.out.println("EMI record successfully inserted..");
-            }
-        } 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     // update transaction history for the lender
     private void updateTransactionHistory(String role,int id){
 
@@ -307,6 +347,27 @@ public class LoanAction extends ActionSupport{
 
             if (result > 0) {
                 System.out.println("Transaction table is updated.. ");
+            }
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // method for updating the loan due date 
+    private void updateDueDate(){
+        String query = "update loans set loan_due_date = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL loan_tenure_months MONTH) where loan_id=? and "
+                        +" loan_due_date IS NULL";
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setInt(1, getLoanId());
+
+            int result = preparedStatement.executeUpdate();
+
+            if (result > 0) {
+                System.out.println("Due date for the loan successfully fixed..");
             }
         } 
         catch (Exception e) {

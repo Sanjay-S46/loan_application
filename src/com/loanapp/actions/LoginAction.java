@@ -90,7 +90,7 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
 
     // authenticating the user
     private boolean checkUser(){
-        String query = "select user_id,randomSalt,password,userType from users where username=?" ;
+        String query = "select user_id,randomSalt,password,userType from users where username=? and isBlocked=0" ;
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -122,15 +122,12 @@ public class LoginAction extends ActionSupport implements ModelDriven<User>{
                 user.setUserId(resultSet.getInt("user_id"));
                 
                 return HashPassword.verifyPassword(user.getPassword(), pwd, salt);
-            }
-            else{
-                return false;
-            }
-            
-        } catch (Exception e) {
+            }    
+        } 
+        catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     @Override

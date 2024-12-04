@@ -6,8 +6,21 @@
     <title>Login Page</title>
     <link rel="stylesheet" href="/loanApplication/css/loginStyle.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <%-- sweetalert cdn link --%>
+
+    <script type="text/javascript">
+        function preventBack() {
+            window.history.forward();
+        }
+        setTimeout('preventBack()', 0);
+    
+        window.onunload = function () {
+            null
+        };
+    </script>
+
 </head>
 <body>
+
     <div class="login-page">
         <div>
             <h1>Login</h1>

@@ -49,7 +49,7 @@
 
         <!-- logout action -->
         <action name="logout" class="com.loanapp.actions.LogoutAction">
-            <result name="*">/login.jsp</result>
+            <result name="*" type="redirect">/login.jsp</result>
         </action>
 
     </package>
@@ -128,7 +128,7 @@
         </action>
 
         <!-- loan actions -->
-        
+
         <action name="applyLoan" class="com.loanapp.actions.borrower.LoanRequestAction">
             <result name="success" type="redirect">home</result>
             <result name="error">/unauthorized.jsp</result>
@@ -185,7 +185,7 @@
 
         <action name="lend_loan" class="com.loanapp.actions.lender.LendLoanAction">
             <result name="success" type="redirect">home</result>
-            <result name="error" type="redirect">/unauthorized.jsp</result>
+            <result name="error" type="redirect">/error.jsp</result>
         </action>
 
         <!-- lender profile actions -->
@@ -198,6 +198,12 @@
         <action name="change_password" class="com.loanapp.utils.ChangePassword">
             <result name="success" type="redirect">home</result>
             <result name="error" type="redirect">userProfile</result>
+        </action>
+
+        <!-- lender payment actions -->
+
+        <action name="payment_page">
+            <result>/jsp/lender/deposit.jsp</result>
         </action>
 
         <action name="deposit_amount" class="com.loanapp.actions.lender.LenderProfileAction" method="depositAmount">

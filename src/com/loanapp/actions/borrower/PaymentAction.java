@@ -215,30 +215,44 @@ public class PaymentAction extends ActionSupport {
 
         long amount = getPayingAmount();
         long pending = getEmiPending();
+
         boolean isSingleLender = checkForSingleLender();
 
         // correct amount payment
         if (amount == pending) {
+            splitAmount(amount);
             updateEmiStatus("Paid");
             updateLoanDistribution();
         }
+
         // lesser amount payment
         else if (amount < pending) {
             if (!isSingleLender) {
                 splitAmount(amount);
             }
+            else{
+                changeMapValue(amount);
+            }
             updateEmiStatus("Due");
         }
+        
         // over amount payment 
         else {
             if (!isSingleLender) {
                 splitAmount(amount);
+            }
+            else{
+                changeMapValue(amount);
             }
             updateEmiStatus("Paid");
             deductFromPrincipleAmount();
             updateLoanDistribution();
         }
 
+        User user = (User) ServletActionContext.getRequest().getSession(false).getAttribute("userSession");
+        setUserId(user.getUserId());
+        
+        updateCurrentLoanBalance(getUserId());
         updateLenderEarning();
         updateTransactionHistory("borrower");
         updateTransactionHistory("lender");
@@ -246,12 +260,18 @@ public class PaymentAction extends ActionSupport {
         return "success" ;
     }
 
+    // method for changing the map value if it is a single user, it will run only one time
+    private void changeMapValue(long amount){
+        for(Integer emiId : emiMap.keySet()){
+            emiMap.put(emiId, amount);
+        }
+    }
 
     // method for splitting the amount if more than one lenders
     private void splitAmount(long amount){
 
         Map<Integer,Long> emiMap = getEmiMap();
-        double emiAmount = (double) getEmiAmount();
+        double emiAmount = (double) getEmiAmount(); // total emi amount 
         double payingAmount = (double) amount;
 
         for(Integer emiId : emiMap.keySet()){
@@ -266,7 +286,7 @@ public class PaymentAction extends ActionSupport {
 
     // method for getting the emi id of particular loans
     public void getEmiIdsOfLoan(){
-        String query = "select emi_id,emi_amount from EMIs where loan_id = ? and status='Due'";
+        String query = "select emi_id, emi_amount from EMIs where loan_id = ? and status='Due'";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -279,6 +299,7 @@ public class PaymentAction extends ActionSupport {
                 long amount = resultSet.getLong(2);
                 emiMap.put(emiID, amount);
             }
+
         } 
         catch (Exception e) {
             e.printStackTrace();
@@ -306,6 +327,36 @@ public class PaymentAction extends ActionSupport {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // method for updating the loan balance of the borrower
+    private void updateCurrentLoanBalance(int userId){
+        
+        String query = "select sum(remaining_principle_amount) from loan_distribution where borrower_id = "
+                    + " (select borrower_id from borrowers where user_id = ?) group by borrower_id " ;
+        try (
+            Connection conn = db.getConnection();
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+        ) {
+            preparedStatement.setInt(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                long loanBalance = resultSet.getLong(1);
+                
+                String updateQuery = "update borrowers set current_loan_balance = + " + loanBalance+ " where user_id = " + userId;
+
+                int result = preparedStatement.executeUpdate(updateQuery);
+
+                if (result > 0) {
+                    System.out.println("Current balance of the borrower is updated");
+                }
+            }
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateLenderEarning(){
@@ -342,29 +393,34 @@ public class PaymentAction extends ActionSupport {
         }   
     }
 
-    private void updateEmiStatus(String status){
-        String query = "update EMIs set amount_paid=?, status=? where emi_id = ?";
+    private void updateEmiStatus(String status) {
+        String updateQuery = "UPDATE EMIs SET amount_paid = amount_paid + ?, status = ? WHERE emi_id = ?";
+        String selectQuery = "SELECT amount_paid FROM EMIs WHERE emi_id = ?";
         try (
             Connection conn = db.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement(query);
+            PreparedStatement updateStatement = conn.prepareStatement(updateQuery);
+            PreparedStatement selectStatement = conn.prepareStatement(selectQuery);
         ) {
-
             for (Integer emiId : emiMap.keySet()) {
-
-                preparedStatement.setLong(1, emiMap.get(emiId));
-                preparedStatement.setString(2, status);
-                preparedStatement.setInt(3, (int)emiId);
-
-                int result = preparedStatement.executeUpdate();
-                if (result > 0) {
-                    System.out.println("EMI status has been updated for emi id = " + emiId);
+                
+                updateStatement.setLong(1, emiMap.get(emiId));
+                updateStatement.setString(2, status);
+                updateStatement.setInt(3, emiId);
+                updateStatement.executeUpdate();
+    
+                selectStatement.setInt(1, emiId);
+                try (ResultSet resultSet = selectStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        long updatedAmount = resultSet.getLong("amount_paid");
+                        emiMap.put(emiId, updatedAmount);
+                    }
                 }
             }
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }   
+        }
     }
+    
 
     private void updateTransactionHistory(String role){
         String query = "insert into transaction_history (user_id, lender_id, borrower_id, amount, transaction_type) values (?,?,?,?,?)";

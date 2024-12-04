@@ -24,9 +24,7 @@ public class LoanRequestAction extends ActionSupport implements ModelDriven<Loan
         return loan;
     }
 
-    // method to check if the applying loan amount is less the maximum
-    // amount allocated for the borrower
-
+    // method to check if the applying loan amount is less the maximum amount allocated for the borrower
     private boolean checkForLoanRequest(int userId){
         String query = "select max_loan_amount from borrowers where user_id = ?";
         try (
@@ -53,8 +51,8 @@ public class LoanRequestAction extends ActionSupport implements ModelDriven<Loan
 
     // applying loan form
     private void applyForLoan(int userId){
-        String query = "insert into loans (borrower_id, requested_amount, loan_type, loan_purpose, loan_tenure_months,balance_amount) "
-                    + "values ( (select borrower_id from borrowers where user_id = ?) , ?, ? ,?, ?, ?)";
+        String query = "insert into loans (borrower_id, requested_amount, loan_type, loan_purpose, loan_tenure_months, balance_amount)"
+                    + " values ( (select borrower_id from borrowers where user_id = ?) , ?, ? ,?, ?, ?)";
 
         try (
             Connection conn = db.getConnection();
@@ -97,6 +95,5 @@ public class LoanRequestAction extends ActionSupport implements ModelDriven<Loan
         return "error";
 
     }
-    
 
 }

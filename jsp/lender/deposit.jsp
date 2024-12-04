@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Page</title>
+    <title>Deposit Page</title>
     <!-- Include Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
@@ -159,15 +159,11 @@
 </head>
 <body>
     <div class="payment-container">
-        <h2>Payment Information</h2>
-        <form action="payment" method="post">
-            
-            <input type="hidden" name="emiAmount" value="<s:property value='emiAmount' />" required>
-            <input type="hidden" name="emiPending" value="<s:property value='emiPending' />" required>
-            <input type="hidden" name="loanId" value="<s:property value='loanId' />" required>
+        <h2>Deposit Amount</h2>
+        <form action="deposit_amount" method="post">
 
             <div class="input-container"> 
-                <input type="text" class="input-field" placeholder="Amount" name="payingAmount" value="<s:property value='emiPending' />" required>
+                <input type="text" class="input-field" placeholder="Amount" name="depositAmount" required>
                 <i class="fa-solid fa-indian-rupee-sign input-icon"></i>
             </div>
 

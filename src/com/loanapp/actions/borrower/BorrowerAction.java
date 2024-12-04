@@ -1,7 +1,6 @@
 package com.loanapp.actions.borrower;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ class EmiDetail{
     private long emiAmount;
     private long emiPaid;
     private long emiPending;
-    private Date date;
+    private String date;
     private int loanId;
 
     // setters
@@ -39,7 +38,7 @@ class EmiDetail{
     public void setEmiPending(long emiPending){
         this.emiPending = emiPending;
     }
-    public void setDate(Date date){
+    public void setDate(String date){
         this.date = date;
     }
     public void setLoanId(int loanId){
@@ -59,7 +58,7 @@ class EmiDetail{
     public long getEmiPending(){
         return emiPending;
     }
-    public Date getDate(){
+    public String getDate(){
         return date;
     }
     public int getLoanId(){
@@ -234,8 +233,6 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan> {
                 // adding to the history array list
                 history.add(transaction);
             }
-            
-            System.out.println("Transaction history displayed.....");
         } 
         catch (Exception e) {
             e.printStackTrace();
@@ -266,7 +263,7 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan> {
 
     // getting the information of the EMI'S of the borrower
     public void getEmiInfo(){
-        String query = "select sum(emi_amount), sum(amount_paid), min(due_date), requested_amount, EMIs.loan_id from EMIs inner join "
+        String query = "select sum(emi_amount), sum(amount_paid), DATE_FORMAT(min(due_date), '%d/%m/%y' ), requested_amount, EMIs.loan_id from EMIs inner join "
                         +" loans on EMIs.loan_id = loans.loan_id where borrower_id = ? and EMIs.status='Due' group by EMIs.loan_id";
         try (
             Connection conn = db.getConnection();
@@ -286,7 +283,7 @@ public class BorrowerAction extends ActionSupport implements ModelDriven<Loan> {
                 emiDetail.setEmiAmount(emi);
                 emiDetail.setEmiPaid(paid);
                 emiDetail.setEmiPending(pending);
-                emiDetail.setDate(resultSet.getDate(3));
+                emiDetail.setDate(resultSet.getString(3));
                 emiDetail.setLoanAmount(resultSet.getLong(4));
                 emiDetail.setLoanId(resultSet.getInt(5));
 

@@ -58,8 +58,8 @@ function validateForm(event) {
         title: "Login Successful",
         text: "You have logged in successfully.",
         confirmButtonText: 'OK',
-        allowOutsideClick: false, // Disable clicking outside to close
-        allowEscapeKey: false,    // Disable pressing escape to close
+        allowOutsideClick: false, 
+        allowEscapeKey: false,    
         willClose: () => {
             document.getElementById("loginForm").submit()
             return true;

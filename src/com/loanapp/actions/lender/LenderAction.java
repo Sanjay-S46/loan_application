@@ -1,7 +1,6 @@
 package com.loanapp.actions.lender;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -79,16 +78,16 @@ class LoanDetail{
 
 class LendingStatus {
     private String borrowerName;
-    private Date borrowDate;
+    private String borrowDate;
     private long amount;
     private int interestRate;
-    private Date dueDate;
+    private String dueDate;
 
     // setters
     public void setBorrowerName(String borrowerName){
         this.borrowerName = borrowerName;
     }
-    public void setBorrowDate(Date borrowDate){
+    public void setBorrowDate(String borrowDate){
         this.borrowDate = borrowDate;
     }
     public void setAmount(long amount){
@@ -97,7 +96,7 @@ class LendingStatus {
     public void setInterestRate(int interestRate){
         this.interestRate = interestRate;
     }
-    public void setDueDate(Date dueDate){
+    public void setDueDate(String dueDate){
         this.dueDate = dueDate;
     }
 
@@ -105,7 +104,7 @@ class LendingStatus {
     public String getBorrowerName(){
         return borrowerName;
     }
-    public Date getBorrowDate(){
+    public String getBorrowDate(){
         return borrowDate;
     }
     public long getAmount(){
@@ -114,7 +113,7 @@ class LendingStatus {
     public int getInterestRate(){
         return interestRate;
     }
-    public Date getDueDate(){
+    public String getDueDate(){
         return dueDate;
     }
 }
@@ -378,10 +377,10 @@ public class LenderAction extends ActionSupport{
     // method used to display the lending status of the loans given by the lender
     private void showLendingStatus(int userId){
         String query = "select (select username from users where user_id = (select user_id from borrowers where borrower_id = "
-                    +" loans.borrower_id)) as borrower_name, updated_at, interest_rate, loan_grant_amount, "
-                    +" DATE_ADD(updated_at, INTERVAL loan_tenure_months MONTH) AS due_date from loan_distribution inner join loans "
+                    +" loans.borrower_id)) as borrower_name, DATE_FORMAT(updated_at, '%d/%m/%y') as updated_at, interest_rate, "
+                    +" loan_grant_amount, DATE_FORMAT(loan_due_date, '%d/%m/%y') as loan_due_date from loan_distribution inner join loans "
                     +" on loan_distribution.loan_id = loans.loan_id inner join lenders on lenders.lender_id=loan_distribution.lender_id " 
-                    + "where lenders.user_id = ?";
+                    + "where lenders.user_id = ? and is_loan_accepted=1";
         try (
             Connection conn = db.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -395,10 +394,10 @@ public class LenderAction extends ActionSupport{
                 lendingStatus = new LendingStatus();
 
                 lendingStatus.setBorrowerName(resultSet.getString("borrower_name"));
-                lendingStatus.setBorrowDate(resultSet.getDate("updated_at"));
+                lendingStatus.setBorrowDate(resultSet.getString("updated_at"));
                 lendingStatus.setAmount(resultSet.getLong("loan_grant_amount"));
                 lendingStatus.setInterestRate(resultSet.getInt("interest_rate"));
-                lendingStatus.setDueDate(resultSet.getDate("due_date"));
+                lendingStatus.setDueDate(resultSet.getString("loan_due_date"));
 
                 statusList.add(lendingStatus);
             }
