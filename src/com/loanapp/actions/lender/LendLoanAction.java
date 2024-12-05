@@ -180,7 +180,6 @@ public class LendLoanAction extends ActionSupport{
 
             if (result > 0) {
                 insertLenderDetails(getLoanId(),lenderId);
-                updateAvailableFunds(lenderId);
                 System.out.println("Loan accepted");
             }
         } 
@@ -188,27 +187,7 @@ public class LendLoanAction extends ActionSupport{
             e.printStackTrace();
         }
     }
-    
-    // method for updating the available funds
-    private void updateAvailableFunds(int lenderId){
-        String query = "update lenders set available_funds = available_funds - ? where lender_id = ?";
-        try (
-            Connection conn = db.getConnection();
-            PreparedStatement preparedStatement = conn.prepareStatement(query);
-        ) {
-            preparedStatement.setLong(1, getGrantLoanAmount());
-            preparedStatement.setInt(2, lenderId);
 
-            int result = preparedStatement.executeUpdate();
-
-            if (result > 0) {
-                System.out.println("Lender's available amount updated..");
-            }
-        } 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     // inserting the lender id in the lender details
     private void insertLenderDetails(int loanId,int lenderId){

@@ -244,7 +244,7 @@ public class LoanAction extends ActionSupport{
     }
     
 
-    // update the lender table's fund amount that is deduct from it
+    // updating the lender table's fund amount that is deduct from it
     private void updateLenderAmount(){
         String query = "update lenders set available_funds = ? where lender_id = ?";
         try (

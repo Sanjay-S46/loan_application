@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loan Application</title>
     <style>
-        body{
+        body {
             background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
         }
+
         .navbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem;
+            padding: 1rem 2rem;
         }
 
         .navbar h1 {
@@ -23,17 +25,18 @@
         .buttons a {
             display: inline-block;
             text-decoration: none;
-            background-color: rgb(104, 104, 220);
+            background-color: #007BFF; /* Blue color */
             color: white;
             font-size: 20px;
             padding: 10px 20px;
             border-radius: 10px;
             margin-left: 10px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .buttons a:hover {
-            background-color: rgb(84, 84, 180);
+            background-color: #0056b3; 
+            transform: translateY(-3px); 
         }
     </style>
 </head>
